@@ -1,0 +1,32 @@
+{
+  "name": "guardianai-pro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GuardianAI Pro – Predictive Multimodal Personal Safety Ecosystem",
+  "workspaces": [
+    "services/frontend",
+    "services/backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev -w services/frontend",
+    "dev:backend": "npm run dev -w services/backend",
+    "dev:ai": "cd services/ai-service && uvicorn main:app --reload --port 8000",
+    "build:frontend": "npm run build -w services/frontend",
+    "build:backend": "npm run build -w services/backend",
+    "lint": "eslint 'services/*/src/**/*.{ts,tsx}' --fix",
+    "format": "prettier --write 'services/*/src/**/*.{ts,tsx,json,css}'",
+    "typecheck": "tsc --noEmit -p services/frontend/tsconfig.json && tsc --noEmit -p services/backend/tsconfig.json",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.34.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^9.0.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.4.0"
+  }
+}

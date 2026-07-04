@@ -1,0 +1,94 @@
+version: "3.9"
+
+x-common-vars: &common-vars
+  NODE_ENV: ${NODE_ENV:-development}
+  MONGODB_URI: ${MONGODB_URI:-mongodb://mongodb:27017/guardianai}
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret-change-in-production}
+  JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-in-production}
+  JWT_ACCESS_EXPIRY: ${JWT_ACCESS_EXPIRY:-15m}
+  JWT_REFRESH_EXPIRY: ${JWT_REFRESH_EXPIRY:-7d}
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+
+services:
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./services/backend
+      target: development
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./services/backend/src:/app/src
+      - /app/node_modules
+    environment:
+      <<: *common-vars
+      PORT: 5000
+      AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8000}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev
+
+  frontend:
+    build:
+      context: ./services/frontend
+      target: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./services/frontend/src:/app/src
+      - /app/node_modules
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:5000/api/v1}
+      VITE_WS_URL: ${VITE_WS_URL:-http://localhost:5000}
+    depends_on:
+      - backend
+    command: npm run dev -- --host 0.0.0.0 --port 3000
+
+  ai-service:
+    build:
+      context: ./services/ai-service
+      target: development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./services/ai-service:/app
+    environment:
+      PYTHONUNBUFFERED: 1
+      MODEL_PATH: ${MODEL_PATH:-/app/models}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  mongodb_data:
+  redis_data:
