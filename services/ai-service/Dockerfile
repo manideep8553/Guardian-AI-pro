@@ -6,14 +6,18 @@ ENV PYTHONUNBUFFERED=1 \
 
 FROM base AS development
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir setuptools && \
+    pip install --no-cache-dir $(grep -v "^openai-whisper" requirements.txt) && \
+    pip install --no-cache-dir --no-build-isolation openai-whisper==20231117
 COPY . .
 EXPOSE 8000
 CMD ["uvicorn", "app.api.v1.api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 FROM base AS build
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir setuptools && \
+    pip install --no-cache-dir $(grep -v "^openai-whisper" requirements.txt) && \
+    pip install --no-cache-dir --no-build-isolation openai-whisper==20231117
 COPY . .
 
 FROM base AS production
