@@ -21,7 +21,7 @@ function getRiskColor(level: RiskLevel | string): string {
     high_risk: 'text-orange-400 border-orange-500/30 bg-orange-500/10',
     critical: 'text-red-400 border-red-500/30 bg-red-500/10',
   };
-  return map[level] || 'text-slate-400 border-slate-500/30 bg-slate-500/10';
+  return map[level] || 'text-muted-foreground border-border bg-muted/10';
 }
 
 function getRiskBg(level: RiskLevel | string): string {
@@ -29,13 +29,13 @@ function getRiskBg(level: RiskLevel | string): string {
     safe: 'bg-green-500', warning: 'bg-yellow-500',
     high_risk: 'bg-orange-500', critical: 'bg-red-500',
   };
-  return map[level] || 'bg-slate-500';
+  return map[level] || 'bg-muted-foreground';
 }
 
 function RiskGauge({ score, level, trend }: { score: number; level: RiskLevel; trend?: RiskTrend }) {
   const pct = Math.round(score * 100);
   const TrendIcon = trend === 'improving' ? ChevronDown : trend === 'degrading' ? ChevronUp : Minus;
-  const trendColor = trend === 'improving' ? 'text-green-400' : trend === 'degrading' ? 'text-red-400' : 'text-slate-400';
+  const trendColor = trend === 'improving' ? 'text-green-400' : trend === 'degrading' ? 'text-red-400' : 'text-muted-foreground';
 
   return (
     <div className="flex items-center gap-4">
@@ -56,7 +56,7 @@ function RiskGauge({ score, level, trend }: { score: number; level: RiskLevel; t
           </span>
           {trend && <TrendIcon className={`h-4 w-4 ${trendColor}`} />}
         </div>
-        <p className="mt-1 text-xs text-slate-500">Overall Risk Score</p>
+        <p className="mt-1 text-xs text-muted-foreground">Overall Risk Score</p>
       </div>
     </div>
   );
@@ -70,17 +70,17 @@ function WorkerCard({ worker }: { worker: LiveWorkerStatus }) {
     <div className={`rounded-lg border p-3 transition-colors ${getRiskColor(worker.riskLevel)}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={`flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-white`}>
+          <div className={`flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-bold text-white`}>
             {worker.name.split(' ').map(n => n[0]).join('')}
           </div>
           <div>
             <p className="text-sm font-medium text-white">{worker.name}</p>
-            <p className="text-xs text-slate-400">{worker.employeeId} · {worker.department}</p>
+            <p className="text-xs text-muted-foreground">{worker.employeeId} · {worker.department}</p>
           </div>
         </div>
         <StatusIcon className={`h-3.5 w-3.5 ${statusColor}`} />
       </div>
-      <div className="mt-2 flex items-center gap-3 text-xs text-slate-400">
+      <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
         <span className={`font-semibold ${getRiskColor(worker.riskLevel).split(' ')[0]}`}>
           Risk: {Math.round(worker.riskScore * 100)}%
         </span>
@@ -88,7 +88,7 @@ function WorkerCard({ worker }: { worker: LiveWorkerStatus }) {
         <span>· {worker.designation}</span>
       </div>
       {worker.vitals && (
-        <div className="mt-1.5 flex gap-3 text-xs text-slate-500">
+        <div className="mt-1.5 flex gap-3 text-xs text-muted-foreground">
           {worker.vitals.heartRate && <span>♥ {worker.vitals.heartRate} bpm</span>}
           {worker.vitals.spo2 !== undefined && <span>O2 {worker.vitals.spo2}%</span>}
           {worker.vitals.temperature && <span>🌡 {worker.vitals.temperature}°C</span>}
@@ -103,7 +103,7 @@ function AlertFeed({ alerts }: { alerts: LiveAlert[] }) {
   return (
     <div className="space-y-2">
       {alerts.slice(0, 8).map((alert) => (
-        <div key={alert.id} className="flex items-start gap-3 rounded-lg border border-slate-700/50 bg-slate-800/30 p-3">
+        <div key={alert.id} className="flex items-start gap-3 rounded-lg border border-border bg-muted/20 p-3">
           <div className={`mt-0.5 flex h-6 w-6 items-center justify-center rounded-full ${getRiskColor(alert.severity)}`}>
             <AlertTriangle className="h-3 w-3" />
           </div>
@@ -114,12 +114,12 @@ function AlertFeed({ alerts }: { alerts: LiveAlert[] }) {
                 {alert.severity}
               </Badge>
             </div>
-            <p className="mt-0.5 truncate text-xs text-slate-400">{alert.zone} · {new Date(alert.timestamp).toLocaleTimeString()}</p>
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">{alert.zone} · {new Date(alert.timestamp).toLocaleTimeString()}</p>
           </div>
         </div>
       ))}
       {alerts.length === 0 && (
-        <p className="py-8 text-center text-sm text-slate-500">No active alerts</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">No active alerts</p>
       )}
     </div>
   );
@@ -147,7 +147,7 @@ function HeatmapGrid() {
           className={`flex items-center justify-center rounded border p-2 text-xs font-medium transition-colors ${heatColor(zone.risk)}`}>
           <div className="text-center">
             <div className="text-white">{zone.name}</div>
-            <div className="text-[10px] text-slate-400">{Math.round(zone.risk * 100)}%</div>
+            <div className="text-[10px] text-muted-foreground">{Math.round(zone.risk * 100)}%</div>
           </div>
         </div>
       ))}
@@ -161,7 +161,7 @@ function EmergencyPanel({ emergencies, onAcknowledge, onResolve }: {
   onResolve: (id: string) => void;
 }) {
   if (emergencies.length === 0) {
-    return <p className="py-8 text-center text-sm text-slate-500">No active emergencies</p>;
+    return <p className="py-8 text-center text-sm text-muted-foreground">No active emergencies</p>;
   }
 
   return (
@@ -174,10 +174,10 @@ function EmergencyPanel({ emergencies, onAcknowledge, onResolve }: {
               <span className="text-sm font-semibold text-white">{em.title}</span>
               <Badge className={getRiskColor(em.severity)}>{em.severity}</Badge>
             </div>
-            <Badge className="text-[10px] text-slate-400">{em.type.replace(/_/g, ' ')}</Badge>
+            <Badge className="text-[10px] text-muted-foreground">{em.type.replace(/_/g, ' ')}</Badge>
           </div>
-          <p className="mt-1 text-xs text-slate-400">{em.description}</p>
-          <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-muted-foreground">{em.description}</p>
+          <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
             {em.requiresEvacuation && <span className="text-yellow-400">🚨 Evacuation required</span>}
             {em.location?.zone && <span>📍 {em.location.zone}</span>}
             <span>· {new Date(em.createdAt).toLocaleTimeString()}</span>
@@ -185,7 +185,7 @@ function EmergencyPanel({ emergencies, onAcknowledge, onResolve }: {
           {em.status === 'active' && (
             <div className="mt-2 flex gap-2">
               <Button size="sm" variant="outline" onClick={() => onAcknowledge(em._id)}
-                className="h-7 border-slate-600 text-xs text-slate-300 hover:bg-slate-700">
+                className="h-7 border-border text-xs text-foreground hover:bg-accent">
                 Acknowledge
               </Button>
               <Button size="sm" onClick={() => onResolve(em._id)}
@@ -310,9 +310,9 @@ export function LiveDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-white">Live Monitoring</h2>
-          <p className="text-slate-400">Real-time multimodal safety intelligence</p>
+          <p className="text-muted-foreground">Real-time multimodal safety intelligence</p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
           {summary?.timestamp ? new Date(summary.timestamp).toLocaleTimeString() : '--'}
         </div>
@@ -320,7 +320,7 @@ export function LiveDashboardPage() {
 
       {/* Risk Gauge + Key Metrics */}
       <div className="grid gap-4 lg:grid-cols-4">
-        <Card className="border-slate-700/50 bg-slate-900/80 lg:col-span-1">
+        <Card className="border-border bg-card lg:col-span-1">
           <CardContent className="p-4">
             {summary && (
               <RiskGauge score={summary.fusion.overallRiskScore} level={summary.fusion.riskLevel} trend={summary.fusion.temporalTrend} />
@@ -337,9 +337,9 @@ export function LiveDashboardPage() {
 
         {summary && (
           <>
-            <Card className="border-slate-700/50 bg-slate-900/80">
+            <Card className="border-border bg-card">
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <Users className="h-4 w-4" />
                   <span className="text-xs font-medium">Workers</span>
                 </div>
@@ -354,27 +354,27 @@ export function LiveDashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-slate-700/50 bg-slate-900/80">
+            <Card className="border-border bg-card">
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <AlertTriangle className="h-4 w-4" />
                   <span className="text-xs font-medium">Alerts</span>
                 </div>
                 <p className="mt-1 text-2xl font-bold text-white">{summary.alerts.length}</p>
-                <p className="mt-1 text-xs text-slate-500">Active safety alerts</p>
+                <p className="mt-1 text-xs text-muted-foreground">Active safety alerts</p>
               </CardContent>
             </Card>
 
-            <Card className="border-slate-700/50 bg-slate-900/80">
+            <Card className="border-border bg-card">
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <Siren className="h-4 w-4" />
                   <span className="text-xs font-medium">Emergencies</span>
                 </div>
                 <p className={`mt-1 text-2xl font-bold ${summary.emergencies > 0 ? 'text-red-400' : 'text-green-400'}`}>
                   {summary.emergencies}
                 </p>
-                <p className="mt-1 text-xs text-slate-500">{summary.emergencies > 0 ? 'Active emergencies' : 'All clear'}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{summary.emergencies > 0 ? 'Active emergencies' : 'All clear'}</p>
               </CardContent>
             </Card>
           </>
@@ -384,7 +384,7 @@ export function LiveDashboardPage() {
       {/* Main grid */}
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Worker Status */}
-        <Card className="border-slate-700/50 bg-slate-900/80 lg:col-span-1">
+        <Card className="border-border bg-card lg:col-span-1">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
               <Users className="h-4 w-4 text-blue-400" />
@@ -395,14 +395,14 @@ export function LiveDashboardPage() {
             <div className="space-y-2">
               {topRiskWorkers.map(w => <WorkerCard key={w.workerId} worker={w} />)}
               {topRiskWorkers.length === 0 && (
-                <p className="py-6 text-center text-sm text-slate-500">No workers monitored</p>
+                <p className="py-6 text-center text-sm text-muted-foreground">No workers monitored</p>
               )}
             </div>
           </CardContent>
         </Card>
 
         {/* AI Alert Feed */}
-        <Card className="border-slate-700/50 bg-slate-900/80 lg:col-span-1">
+        <Card className="border-border bg-card lg:col-span-1">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
               <Bell className="h-4 w-4 text-yellow-400" />
@@ -415,7 +415,7 @@ export function LiveDashboardPage() {
         </Card>
 
         {/* Emergency Panel */}
-        <Card className="border-slate-700/50 bg-slate-900/80 lg:col-span-1">
+        <Card className="border-border bg-card lg:col-span-1">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
               <Siren className="h-4 w-4 text-red-400" />
@@ -431,7 +431,7 @@ export function LiveDashboardPage() {
       {/* Second row */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Factory Heatmap */}
-        <Card className="border-slate-700/50 bg-slate-900/80">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
               <Map className="h-4 w-4 text-emerald-400" />
@@ -444,7 +444,7 @@ export function LiveDashboardPage() {
         </Card>
 
         {/* Camera Feeds / Sensors */}
-        <Card className="border-slate-700/50 bg-slate-900/80">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
               <Camera className="h-4 w-4 text-cyan-400" />
@@ -454,11 +454,11 @@ export function LiveDashboardPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
               {['Entrance A', 'Assembly Line 3', 'Warehouse B', 'Chemical Storage'].map((cam) => (
-                <div key={cam} className="relative aspect-video rounded-lg border border-slate-700/50 bg-slate-800/50">
+                <div key={cam} className="relative aspect-video rounded-lg border border-border bg-muted/30">
                   <div className="flex h-full items-center justify-center">
                     <div className="text-center">
-                      <Camera className="mx-auto h-8 w-8 text-slate-600" />
-                      <p className="mt-1 text-xs text-slate-500">{cam}</p>
+                      <Camera className="mx-auto h-8 w-8 text-muted-foreground" />
+                      <p className="mt-1 text-xs text-muted-foreground">{cam}</p>
                       <span className="mt-1 inline-flex items-center rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] text-green-400">
                         ● Live
                       </span>
@@ -468,21 +468,21 @@ export function LiveDashboardPage() {
               ))}
             </div>
             <div className="mt-3 grid grid-cols-4 gap-2">
-              <div className="rounded bg-slate-800/50 p-2 text-center">
-                <Thermometer className="mx-auto h-4 w-4 text-slate-400" />
-                <p className="text-xs text-slate-400">24.5°C</p>
+              <div className="rounded bg-muted/30 p-2 text-center">
+                <Thermometer className="mx-auto h-4 w-4 text-muted-foreground" />
+                <p className="text-xs text-muted-foreground">24.5°C</p>
               </div>
-              <div className="rounded bg-slate-800/50 p-2 text-center">
-                <Wind className="mx-auto h-4 w-4 text-slate-400" />
-                <p className="text-xs text-slate-400">42% RH</p>
+              <div className="rounded bg-muted/30 p-2 text-center">
+                <Wind className="mx-auto h-4 w-4 text-muted-foreground" />
+                <p className="text-xs text-muted-foreground">42% RH</p>
               </div>
-              <div className="rounded bg-slate-800/50 p-2 text-center">
-                <Activity className="mx-auto h-4 w-4 text-slate-400" />
-                <p className="text-xs text-slate-400">85 dB</p>
+              <div className="rounded bg-muted/30 p-2 text-center">
+                <Activity className="mx-auto h-4 w-4 text-muted-foreground" />
+                <p className="text-xs text-muted-foreground">85 dB</p>
               </div>
-              <div className="rounded bg-slate-800/50 p-2 text-center">
-                <Zap className="mx-auto h-4 w-4 text-slate-400" />
-                <p className="text-xs text-slate-400">AQI 42</p>
+              <div className="rounded bg-muted/30 p-2 text-center">
+                <Zap className="mx-auto h-4 w-4 text-muted-foreground" />
+                <p className="text-xs text-muted-foreground">AQI 42</p>
               </div>
             </div>
           </CardContent>
@@ -491,7 +491,7 @@ export function LiveDashboardPage() {
 
       {/* Modality Scores */}
       {summary && (
-        <Card className="border-slate-700/50 bg-slate-900/80">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
               <Activity className="h-4 w-4 text-purple-400" />
@@ -507,17 +507,17 @@ export function LiveDashboardPage() {
                 const score = 0;
                 const level: RiskLevel = score > 0.7 ? 'critical' : score > 0.45 ? 'high_risk' : score > 0.2 ? 'warning' : 'safe';
                 return (
-                  <div key={key} className="rounded-lg border border-slate-700/50 bg-slate-800/30 p-3 text-center">
-                    <div className="flex justify-center text-slate-400">
+                  <div key={key} className="rounded-lg border border-border bg-muted/20 p-3 text-center">
+                    <div className="flex justify-center text-muted-foreground">
                       {modalityIcons[key] || <Activity className="h-4 w-4" />}
                     </div>
-                    <p className="mt-1 text-xs text-slate-400">{label}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{label}</p>
                     <div className="mt-1.5 flex items-center justify-center gap-1">
-                      <div className="h-1.5 w-12 overflow-hidden rounded-full bg-slate-700">
+                      <div className="h-1.5 w-12 overflow-hidden rounded-full bg-muted">
                         <div className={`h-full rounded-full ${getRiskBg(level)}`} style={{ width: `${Math.round(score * 100)}%` }} />
                       </div>
                     </div>
-                    <p className="mt-0.5 text-[10px] text-slate-500">
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">
                       No data streaming
                     </p>
                   </div>
