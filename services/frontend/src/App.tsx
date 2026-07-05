@@ -4,7 +4,6 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { StudyRoomsPage } from './pages/StudyRoomsPage';
 import { CodeEditorPage } from './pages/CodeEditorPage';
 import { WhiteboardPage } from './pages/WhiteboardPage';
 import { ResourcesPage } from './pages/ResourcesPage';
@@ -25,7 +24,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Loading your study space...</p>
+          <p className="text-sm text-muted-foreground">Loading your safety dashboard...</p>
         </div>
       </div>
     );
@@ -46,7 +45,7 @@ export default function App() {
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Loading your study space...</p>
+          <p className="text-sm text-muted-foreground">Loading your safety dashboard...</p>
         </div>
       </div>
     );
@@ -75,7 +74,6 @@ export default function App() {
           }
         >
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/study-rooms" element={<StudyRoomsPage />} />
           <Route path="/code-editor" element={<CodeEditorPage />} />
           <Route path="/whiteboard" element={<WhiteboardPage />} />
           <Route path="/resources" element={<ResourcesPage />} />

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   TrendingUp, Clock, Zap, Target, Award, Download,
-  Flame, Calendar, Brain, Activity, BarChart3, PieChart
+  Flame, Calendar, Activity, BarChart3, PieChart, Shield
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, AreaChart, Area,
@@ -22,15 +22,15 @@ const dateRanges = [
 ];
 
 function generateDailyData(days: number) {
-  const data: { date: string; hours: number; focus: number; breaks: number }[] = [];
+  const data: { date: string; incidents: number; severity: number; resolved: number }[] = [];
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     data.push({
       date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      hours: Math.round((Math.random() * 4 + 0.5) * 10) / 10,
-      focus: Math.round((Math.random() * 3 + 0.5) * 10) / 10,
-      breaks: Math.round(Math.random() * 2 * 10) / 10,
+      incidents: Math.round((Math.random() * 4 + 0.5) * 10) / 10,
+      severity: Math.round((Math.random() * 3 + 0.5) * 10) / 10,
+      resolved: Math.round(Math.random() * 2 * 10) / 10,
     });
   }
   return data;
@@ -38,20 +38,19 @@ function generateDailyData(days: number) {
 
 function generateSubjectData() {
   return [
-    { subject: 'Math', hours: 28.5, color: '#6366f1' },
-    { subject: 'CS', hours: 35.2, color: '#3b82f6' },
-    { subject: 'Physics', hours: 18.7, color: '#10b981' },
-    { subject: 'Chemistry', hours: 12.3, color: '#f59e0b' },
-    { subject: 'Languages', hours: 8.1, color: '#ef4444' },
-    { subject: 'Biology', hours: 6.4, color: '#8b5cf6' },
+    { subject: 'Safety Incidents', hours: 28.5, color: '#6366f1' },
+    { subject: 'Equipment Health', hours: 35.2, color: '#3b82f6' },
+    { subject: 'Worker Compliance', hours: 18.7, color: '#10b981' },
+    { subject: 'Environmental', hours: 12.3, color: '#f59e0b' },
+    { subject: 'Training', hours: 8.1, color: '#ef4444' },
   ];
 }
 
 function generateDistributionData() {
   return [
-    { name: 'Study', value: 65, color: '#6366f1' },
-    { name: 'Coding', value: 20, color: '#3b82f6' },
-    { name: 'Break', value: 15, color: '#10b981' },
+    { name: 'Incidents', value: 65, color: '#6366f1' },
+    { name: 'Inspections', value: 20, color: '#3b82f6' },
+    { name: 'Resolved', value: 15, color: '#10b981' },
   ];
 }
 
@@ -84,22 +83,20 @@ export function AnalyticsPage() {
   const heatmapData = useMemo(() => generateHeatmapData(), []);
 
   const stats = [
-    { title: 'Total Hours', value: '142.5', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10', change: '+12%' },
-    { title: 'Avg Daily', value: '3.8h', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10', change: '+5%' },
-    { title: 'Current Streak', value: '12 days', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10', change: '+3' },
-    { title: 'Tasks Done', value: '48', icon: Target, color: 'text-purple-500', bg: 'bg-purple-500/10', change: '+8' },
-    { title: 'Sessions', value: '86', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/10', change: '+15%' },
+    { title: 'Total Incidents', value: '142', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10', change: '-12%' },
+    { title: 'Avg Risk Score', value: '3.8', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10', change: '-5%' },
+    { title: 'Safety Streak', value: '12 days', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10', change: '+3' },
+    { title: 'Inspections', value: '48', icon: Target, color: 'text-purple-500', bg: 'bg-purple-500/10', change: '+8' },
+    { title: 'Alerts Resolved', value: '86', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/10', change: '+15%' },
   ];
-
-
 
   const streakMetrics = [
-    { label: 'Current Streak', value: '12 days', icon: Flame, color: 'text-orange-500' },
+    { label: 'Safety Streak', value: '12 days', icon: Flame, color: 'text-orange-500' },
     { label: 'Longest Streak', value: '24 days', icon: Award, color: 'text-purple-500' },
-    { label: 'This Week', value: '21.5h', icon: Clock, color: 'text-blue-500' },
+    { label: 'This Week', value: '21', icon: Shield, color: 'text-blue-500' },
   ];
 
-  const productivityScore = 78;
+  const safetyScore = 78;
 
   return (
     <div className="space-y-6">
@@ -110,7 +107,7 @@ export function AnalyticsPage() {
       >
         <div>
           <h1 className="text-3xl font-bold gradient-text">Analytics</h1>
-          <p className="text-muted-foreground mt-1">Track your study patterns and productivity</p>
+          <p className="text-muted-foreground mt-1">Track safety incidents and compliance metrics</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
@@ -171,7 +168,7 @@ export function AnalyticsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Activity className="h-4 w-4 text-blue-500" />
-                Daily Study Hours
+                Daily Incidents
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -189,7 +186,7 @@ export function AnalyticsPage() {
                         fontSize: '12px',
                       }}
                     />
-                    <Line type="monotone" dataKey="hours" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                    <Line type="monotone" dataKey="incidents" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -206,7 +203,7 @@ export function AnalyticsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-emerald-500" />
-                Subjects Comparison
+                Safety Categories
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -215,7 +212,7 @@ export function AnalyticsPage() {
                   <BarChart data={subjectData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis type="number" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-                    <YAxis dataKey="subject" type="category" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" width={70} />
+                    <YAxis dataKey="subject" type="category" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" width={90} />
                     <Tooltip
                       contentStyle={{
                         background: 'hsl(var(--card))',
@@ -245,7 +242,7 @@ export function AnalyticsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-purple-500" />
-                Focus Time Trend
+                Severity Trend
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -269,7 +266,7 @@ export function AnalyticsPage() {
                         fontSize: '12px',
                       }}
                     />
-                    <Area type="monotone" dataKey="focus" stroke="#8b5cf6" strokeWidth={2} fill="url(#focusGradient)" />
+                    <Area type="monotone" dataKey="severity" stroke="#8b5cf6" strokeWidth={2} fill="url(#focusGradient)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -286,7 +283,7 @@ export function AnalyticsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <PieChart className="h-4 w-4 text-amber-500" />
-                Time Distribution
+                Safety Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -336,7 +333,7 @@ export function AnalyticsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-primary" />
-                Activity Calendar
+                Incident Calendar
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -365,7 +362,7 @@ export function AnalyticsPage() {
                             count === 3 ? 'bg-primary/65' :
                             'bg-primary/90'
                           )}
-                          title={dataPoint ? `${dataPoint.date}: ${count} hours` : ''}
+                          title={dataPoint ? `${dataPoint.date}: ${count} incidents` : ''}
                         />
                       );
                     })}
@@ -400,7 +397,7 @@ export function AnalyticsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Award className="h-4 w-4 text-orange-500" />
-                Streak Metrics
+                Safety Streak
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -419,8 +416,8 @@ export function AnalyticsPage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
-                <Brain className="h-4 w-4 text-primary" />
-                Productivity Score
+                <Shield className="h-4 w-4 text-primary" />
+                Safety Score
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
@@ -433,15 +430,15 @@ export function AnalyticsPage() {
                     stroke="#6366f1"
                     strokeWidth="8"
                     strokeLinecap="round"
-                    strokeDasharray={`${(productivityScore / 100) * 327} 327`}
+                    strokeDasharray={`${(safetyScore / 100) * 327} 327`}
                     className="transition-all duration-1000"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold">{productivityScore}%</span>
+                  <span className="text-2xl font-bold">{safetyScore}%</span>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">Based on consistency and focus time</p>
+              <p className="text-xs text-muted-foreground">Based on compliance and incident resolution</p>
             </CardContent>
           </Card>
         </motion.div>

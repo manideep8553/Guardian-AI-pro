@@ -3,12 +3,9 @@ import type {
   ApiResponse,
   AuthResponse,
   User,
-  StudyRoom,
   Task,
   Resource,
-  StudyAnalytics,
-  LeaderboardEntry,
-  CodingSession,
+  SafetyAnalytics,
 } from '../types';
 
 class ApiService {
@@ -150,7 +147,8 @@ class ApiService {
     password: string;
     firstName: string;
     lastName: string;
-    institution?: string;
+    department?: string;
+    employeeId?: string;
   }) {
     const res = await this.request<AuthResponse>('/auth/register', {
       method: 'POST',
@@ -179,26 +177,6 @@ class ApiService {
 
   async getMe() {
     return this.request<{ user: User }>('/auth/me');
-  }
-
-  async getStudyRooms(params?: Record<string, string>) {
-    const query = params ? '?' + new URLSearchParams(params).toString() : '';
-    return this.request<StudyRoom[]>(`/study-rooms${query}`);
-  }
-
-  async createStudyRoom(data: {
-    name: string;
-    description: string;
-    subject: string;
-    isPrivate: boolean;
-    password?: string;
-    maxParticipants: number;
-    tags?: string[];
-  }) {
-    return this.request<StudyRoom>('/study-rooms', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
   }
 
   async getTasks(params?: Record<string, string>) {
@@ -241,37 +219,7 @@ class ApiService {
   }
 
   async getAnalytics() {
-    return this.request<StudyAnalytics>('/analytics');
-  }
-
-  async getLeaderboard() {
-    return this.request<LeaderboardEntry[]>('/leaderboard');
-  }
-
-  async getCodingSessions() {
-    return this.request<CodingSession[]>('/code/sessions');
-  }
-
-  async createCodingSession(data: {
-    language: string;
-    code: string;
-    input?: string;
-  }) {
-    return this.request<CodingSession>('/code/sessions', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async executeCode(data: {
-    language: string;
-    code: string;
-    input?: string;
-  }) {
-    return this.request<{ output: string; duration: number }>('/code/execute', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    return this.request<SafetyAnalytics>('/analytics');
   }
 
   async chatWithAI(messages: { role: 'user' | 'assistant'; content: string }[]) {

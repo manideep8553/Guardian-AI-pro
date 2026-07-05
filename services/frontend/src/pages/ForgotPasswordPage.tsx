@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card';
 import { useToast } from '../components/ui/toast';
-import { GraduationCap, Mail, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Shield, Mail, Loader2, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 type FormState = 'idle' | 'sending' | 'sent' | 'error';
@@ -68,7 +68,7 @@ export function ForgotPasswordPage() {
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-40 -top-40 h-[500px] w-[500px] animate-pulse rounded-full bg-blue-500/10 blur-[120px]" />
         <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] animate-pulse rounded-full bg-indigo-500/10 blur-[120px] delay-1000" />
-        <div className="absolute left-1/2 top-1/3 h-[300px] w-[300px] animate-pulse rounded-full bg-purple-500/5 blur-[100px] delay-500" />
+        <div className="absolute left-1/2 top-1/3 h-[300px] w-[300px] animate-pulse rounded-full bg-blue-500/5 blur-[100px] delay-500" />
       </div>
 
       <motion.div
@@ -85,13 +85,13 @@ export function ForgotPasswordPage() {
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
               className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/25"
             >
-              <GraduationCap className="h-7 w-7 text-white" />
+              <Shield className="h-7 w-7 text-white" />
             </motion.div>
             <CardTitle className="text-2xl font-bold tracking-tight text-white">
               Reset your password
             </CardTitle>
             <CardDescription className="text-slate-400">
-              Enter your email and we&apos;ll send you reset instructions
+              Enter your registered email for reset instructions
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -142,7 +142,7 @@ export function ForgotPasswordPage() {
                     <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                     <Input
                       type="email"
-                      placeholder="you@school.edu"
+                      placeholder="you@company.com"
                       value={email}
                       onChange={(e) => {
                         setEmail(e.target.value);
@@ -187,7 +187,7 @@ export function ForgotPasswordPage() {
               Back to sign in
             </Link>
             <p className="text-xs text-slate-600">
-              &copy; 2026 StudyRoom. All rights reserved.
+              &copy; 2026 GuardianAI Pro. All rights reserved.
             </p>
           </CardFooter>
         </Card>

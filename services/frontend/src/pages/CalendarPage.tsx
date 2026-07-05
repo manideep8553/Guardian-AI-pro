@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus,
-  Clock, Video, MapPin, Users, BookOpen, Sparkles,
+  Clock, MapPin, Users, Shield, AlertTriangle,
   List, Grid3X3
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -27,7 +27,7 @@ interface CalendarEvent {
   date: string;
   startTime: string;
   endTime: string;
-  type: 'study' | 'meeting' | 'tutor' | 'exam' | 'workshop';
+  type: 'inspection' | 'audit' | 'training' | 'drill' | 'maintenance';
   room: string;
   participants: number;
 }
@@ -37,21 +37,21 @@ function generateMockEvents(): CalendarEvent[] {
   const year = now.getFullYear();
   const month = now.getMonth();
   const events: CalendarEvent[] = [];
-  const types = ['study', 'meeting', 'tutor', 'exam', 'workshop'] as const;
-  const rooms = ['Math Study Room', 'CS Lab', 'Physics Hall', 'Chem Lab', 'Languages Room', 'General Study'];
+  const types = ['inspection', 'audit', 'training', 'drill', 'maintenance'] as const;
+  const rooms = ['Zone A Inspection', 'Maintenance Bay', 'Safety Office', 'Control Room', 'Training Center', 'Warehouse'];
 
   for (let i = 0; i < 25; i++) {
     const day = 1 + Math.floor(Math.random() * 28);
     const hour = 8 + Math.floor(Math.random() * 10);
     const type = types[Math.floor(Math.random() * types.length)];
     const titles: Record<string, string[]> = {
-      study: ['Calculus Review', 'DSA Practice', 'Physics Problem Set', 'Chemistry Lab Prep', 'Spanish Conversation'],
-      meeting: ['Project Sync', 'Study Group Planning', 'Research Discussion', 'Peer Review Session'],
-      tutor: ['Math Tutoring', 'CS Mentoring', 'Writing Workshop', 'Physics Help Session'],
-      exam: ['Midterm Review', 'Final Exam Prep', 'Quiz Review', 'Practice Test'],
-      workshop: ['Code Lab', 'Writing Workshop', 'Research Methods', 'Presentation Skills'],
+      inspection: ['Zone B Safety Inspection', 'Fire Extinguisher Check', 'Electrical Panel Review', 'Structural Integrity Check', 'Ventilation System Audit'],
+      audit: ['Compliance Audit - Plant 2', 'Safety Protocol Review', 'Regulatory Compliance Check', 'Documentation Review'],
+      training: ['Fire Safety Training', 'First Aid Certification', 'HAZMAT Handling Course', 'Confined Space Entry Training'],
+      drill: ['Emergency Evacuation Drill', 'Chemical Spill Drill', 'Earthquake Response Drill', 'Fire Drill'],
+      maintenance: ['Conveyor Belt Maintenance', 'HVAC System Service', 'Generator Inspection', 'Pipeline Pressure Test'],
     };
-    const titleOptions = titles[type] || titles.study;
+    const titleOptions = titles[type] || titles.inspection;
     const title = titleOptions[Math.floor(Math.random() * titleOptions.length)];
     events.push({
       id: `evt-${i}`,
@@ -85,19 +85,19 @@ function getFirstDayOfMonth(year: number, month: number): number {
 }
 
 const typeColors: Record<string, string> = {
-  study: 'bg-blue-500/15 text-blue-500 border-blue-500/30',
-  meeting: 'bg-purple-500/15 text-purple-500 border-purple-500/30',
-  tutor: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
-  exam: 'bg-red-500/15 text-red-500 border-red-500/30',
-  workshop: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
+  inspection: 'bg-blue-500/15 text-blue-500 border-blue-500/30',
+  audit: 'bg-purple-500/15 text-purple-500 border-purple-500/30',
+  training: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
+  drill: 'bg-red-500/15 text-red-500 border-red-500/30',
+  maintenance: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
 };
 
 const typeIcons: Record<string, React.ElementType> = {
-  study: BookOpen,
-  meeting: Users,
-  tutor: Sparkles,
-  exam: CalendarIcon,
-  workshop: Users,
+  inspection: Shield,
+  audit: Users,
+  training: AlertTriangle,
+  drill: CalendarIcon,
+  maintenance: Users,
 };
 
 export function CalendarPage() {
@@ -106,7 +106,7 @@ export function CalendarPage() {
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [events] = useState<CalendarEvent[]>(generateMockEvents);
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [newEvent, setNewEvent] = useState<Omit<CalendarEvent, 'id' | 'participants'>>({ title: '', type: 'study', date: '', startTime: '', endTime: '', room: '' });
+  const [newEvent, setNewEvent] = useState<Omit<CalendarEvent, 'id' | 'participants'>>({ title: '', type: 'inspection', date: '', startTime: '', endTime: '', room: '' });
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -181,7 +181,7 @@ export function CalendarPage() {
       >
         <div>
           <h1 className="text-3xl font-bold gradient-text">Calendar</h1>
-          <p className="text-muted-foreground mt-1">Schedule and manage study sessions</p>
+          <p className="text-muted-foreground mt-1">Schedule and manage safety inspections</p>
         </div>
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
@@ -193,12 +193,12 @@ export function CalendarPage() {
           <DialogContent className="sm:max-w-[450px]">
             <DialogHeader>
               <DialogTitle>Add Event</DialogTitle>
-              <DialogDescription>Schedule a new study session or event</DialogDescription>
+              <DialogDescription>Schedule inspection or safety event</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Event Title</label>
-                <Input value={newEvent.title} onChange={e => setNewEvent(prev => ({ ...prev, title: e.target.value }))} placeholder="e.g., Calculus Review" />
+                <Input value={newEvent.title} onChange={e => setNewEvent(prev => ({ ...prev, title: e.target.value }))} placeholder="e.g., Zone B Inspection" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -207,14 +207,14 @@ export function CalendarPage() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Type</label>
-                  <Select value={newEvent.type} onValueChange={v => setNewEvent(prev => ({ ...prev, type: v as 'study' | 'meeting' | 'tutor' | 'exam' | 'workshop' }))}>
+                  <Select value={newEvent.type} onValueChange={v => setNewEvent(prev => ({ ...prev, type: v as 'inspection' | 'audit' | 'training' | 'drill' | 'maintenance' }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="study">Study</SelectItem>
-                      <SelectItem value="meeting">Meeting</SelectItem>
-                      <SelectItem value="tutor">Tutor</SelectItem>
-                      <SelectItem value="exam">Exam</SelectItem>
-                      <SelectItem value="workshop">Workshop</SelectItem>
+                      <SelectItem value="inspection">Inspection</SelectItem>
+                      <SelectItem value="audit">Audit</SelectItem>
+                      <SelectItem value="training">Training</SelectItem>
+                      <SelectItem value="drill">Drill</SelectItem>
+                      <SelectItem value="maintenance">Maintenance</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -230,8 +230,8 @@ export function CalendarPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Room/ Location</label>
-                <Input value={newEvent.room} onChange={e => setNewEvent(prev => ({ ...prev, room: e.target.value }))} placeholder="e.g., CS Lab 201" />
+                <label className="text-sm font-medium">Zone / Location</label>
+                <Input value={newEvent.room} onChange={e => setNewEvent(prev => ({ ...prev, room: e.target.value }))} placeholder="e.g., Zone A Inspection" />
               </div>
             </div>
             <div className="flex justify-end gap-3">
@@ -376,7 +376,7 @@ export function CalendarPage() {
                               </div>
                             </div>
                             <Button size="sm" variant="ghost" className="h-8 gap-1 opacity-0 group-hover:opacity-100 text-xs">
-                              <Video className="h-3 w-3" /> Join
+                              <Shield className="h-3 w-3" /> View
                             </Button>
                           </motion.div>
                         );
@@ -409,17 +409,17 @@ export function CalendarPage() {
                 <div className="p-3 rounded-lg bg-emerald-500/10 text-center">
                   <Clock className="h-5 w-5 mx-auto text-emerald-500 mb-1" />
                   <p className="text-2xl font-bold text-emerald-500">{totalHours}h</p>
-                  <p className="text-[10px] text-muted-foreground">Study hours scheduled</p>
+                  <p className="text-[10px] text-muted-foreground">Inspections scheduled</p>
                 </div>
                 <div className="p-3 rounded-lg bg-purple-500/10 text-center">
                   <Users className="h-5 w-5 mx-auto text-purple-500 mb-1" />
                   <p className="text-2xl font-bold text-purple-500">
                     {events.reduce((sum, e) => sum + e.participants, 0)}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">Total participants</p>
+                  <p className="text-[10px] text-muted-foreground">Total personnel</p>
                 </div>
                 <div className="p-3 rounded-lg bg-amber-500/10 text-center">
-                  <Sparkles className="h-5 w-5 mx-auto text-amber-500 mb-1" />
+                  <Shield className="h-5 w-5 mx-auto text-amber-500 mb-1" />
                   <p className="text-2xl font-bold text-amber-500">
                     {events.filter(e => new Date(e.date) >= new Date()).length}
                   </p>
@@ -441,7 +441,7 @@ export function CalendarPage() {
                 .map(event => (
                   <div key={event.id} className="flex items-start gap-2 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                     <div className={cn('p-1.5 rounded-md', typeColors[event.type].split(' ')[0])}>
-                      {React.createElement(typeIcons[event.type] || BookOpen, { className: 'h-3.5 w-3.5' })}
+                      {React.createElement(typeIcons[event.type] || Shield, { className: 'h-3.5 w-3.5' })}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">{event.title}</p>

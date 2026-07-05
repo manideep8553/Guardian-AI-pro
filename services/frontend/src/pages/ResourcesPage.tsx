@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Upload, FileText, Link2, Code2, BookOpen,
+  Upload, FileText, Link2, Code2, Shield,
   Download, Search, Filter, File as FileIcon,
   Image as ImageIcon, X, ArrowUpFromLine
 } from 'lucide-react';
@@ -23,13 +23,13 @@ import { cn, getInitials, formatDate, truncate } from '../lib/utils';
 const resourceTypes = ['all', 'notes', 'pdfs', 'links', 'code', 'images'] as const;
 type ResourceType = typeof resourceTypes[number];
 
-const subjects = ['Math', 'CS', 'Physics', 'Chemistry', 'Languages', 'Biology', 'History', 'Literature'];
+const categories = ['Safety', 'Compliance', 'Maintenance', 'Training', 'Emergency'];
 
 interface Resource {
   id: string;
   type: ResourceType;
   title: string;
-  subject: string;
+  category: string;
   content: string;
   author: string;
   authorImage: string;
@@ -40,23 +40,23 @@ interface Resource {
 }
 
 const mockResources: Resource[] = [
-  { id: 'r1', type: 'notes', title: 'Calculus II - Integration Techniques', subject: 'Math', content: 'Complete notes on integration by parts, trigonometric substitution, partial fractions, and improper integrals with step-by-step examples and practice problems.', author: 'Dr. Sarah Miller', authorImage: '', date: new Date(Date.now() - 86400000).toISOString(), tags: ['calculus', 'integration', 'advanced'], downloads: 234 },
-  { id: 'r2', type: 'pdfs', title: 'Data Structures Cheat Sheet', subject: 'CS', content: 'Comprehensive reference for arrays, linked lists, trees, graphs, hash tables, and sorting algorithms with time/space complexity analysis.', author: 'Prof. James Chen', authorImage: '', date: new Date(Date.now() - 172800000).toISOString(), tags: ['algorithms', 'dsa', 'reference'], downloads: 567 },
-  { id: 'r3', type: 'links', title: 'Interactive Physics Simulations', subject: 'Physics', content: 'Collection of PhET interactive simulations for mechanics, electromagnetism, thermodynamics, and quantum physics concepts.', author: 'Physics Dept', authorImage: '', date: new Date(Date.now() - 259200000).toISOString(), tags: ['simulations', 'interactive', 'visualization'], downloads: 189, url: 'https://phet.colorado.edu' },
-  { id: 'r4', type: 'code', title: 'NLP Text Classifier', subject: 'CS', content: 'Python implementation of a text classification pipeline using TF-IDF vectorization and logistic regression with scikit-learn.', author: 'ML Group', authorImage: '', date: new Date(Date.now() - 345600000).toISOString(), tags: ['python', 'machine-learning', 'nlp'], downloads: 123 },
-  { id: 'r5', type: 'images', title: 'Organic Chemistry Reaction Map', subject: 'Chemistry', content: 'Visual map of major organic chemistry reactions including substitution, elimination, addition, and rearrangement pathways.', author: 'Chem Lab', authorImage: '', date: new Date(Date.now() - 432000000).toISOString(), tags: ['organic', 'reactions', 'visual'], downloads: 445 },
-  { id: 'r6', type: 'notes', title: 'Linear Algebra - Vector Spaces', subject: 'Math', content: 'Lecture notes covering vector spaces, subspaces, linear independence, basis, dimension, and linear transformations with proofs.', author: 'Dr. Emily Park', authorImage: '', date: new Date(Date.now() - 518400000).toISOString(), tags: ['linear-algebra', 'vectors', 'proofs'], downloads: 312 },
-  { id: 'r7', type: 'pdfs', title: 'Spanish Grammar Guide', subject: 'Languages', content: 'Complete grammar reference for Spanish including verb conjugations, tenses, pronouns, and sentence structure with examples.', author: 'Language Center', authorImage: '', date: new Date(Date.now() - 604800000).toISOString(), tags: ['spanish', 'grammar', 'reference'], downloads: 678 },
-  { id: 'r8', type: 'code', title: 'React Custom Hooks Collection', subject: 'CS', content: 'Collection of reusable React custom hooks including useDebounce, useLocalStorage, useMediaQuery, and useIntersectionObserver.', author: 'Web Dev Team', authorImage: '', date: new Date(Date.now() - 691200000).toISOString(), tags: ['react', 'hooks', 'javascript'], downloads: 891 },
-  { id: 'r9', type: 'images', title: 'Human Anatomy Diagram', subject: 'Biology', content: 'Detailed anatomical diagrams of the human skeletal, muscular, circulatory, and nervous systems with labeled components.', author: 'Bio Dept', authorImage: '', date: new Date(Date.now() - 777600000).toISOString(), tags: ['anatomy', 'biology', 'diagrams'], downloads: 234 },
-  { id: 'r10', type: 'links', title: 'World History Timeline', subject: 'History', content: 'Interactive timeline of major world events from ancient civilizations to modern era with detailed descriptions and media.', author: 'History Guild', authorImage: '', date: new Date(Date.now() - 864000000).toISOString(), tags: ['history', 'timeline', 'interactive'], downloads: 156, url: 'https://worldhistory.org' },
-  { id: 'r11', type: 'notes', title: 'Literary Analysis: Modernist Poetry', subject: 'Literature', content: 'Analysis of modernist poetry techniques including stream of consciousness, fragmentation, and allusion with examples from Eliot, Pound, and Woolf.', author: 'Prof. Maria Santos', authorImage: '', date: new Date(Date.now() - 950400000).toISOString(), tags: ['poetry', 'modernism', 'literary-analysis'], downloads: 89 },
-  { id: 'r12', type: 'pdfs', title: 'Statistics Formula Sheet', subject: 'Math', content: 'Essential formulas for probability, distributions, hypothesis testing, regression analysis, and Bayesian statistics.', author: 'Statistics Dept', authorImage: '', date: new Date(Date.now() - 1036800000).toISOString(), tags: ['statistics', 'formulas', 'reference'], downloads: 723 },
+  { id: 'r1', type: 'notes', title: 'Safety Protocol v3.2', category: 'Safety', content: 'Complete safety protocols covering PPE requirements, hazard communication, lockout/tagout procedures, and emergency response guidelines for all plant zones.', author: 'Safety Dept', authorImage: '', date: new Date(Date.now() - 86400000).toISOString(), tags: ['protocols', 'safety', 'ppe'], downloads: 234 },
+  { id: 'r2', type: 'pdfs', title: 'Emergency Evacuation Map', category: 'Emergency', content: 'Comprehensive evacuation route maps for all facility zones including assembly points, emergency exits, fire extinguisher locations, and first aid stations.', author: 'Emergency Response Team', authorImage: '', date: new Date(Date.now() - 172800000).toISOString(), tags: ['evacuation', 'maps', 'emergency'], downloads: 567 },
+  { id: 'r3', type: 'links', title: 'Equipment Manual - Assembly Line 3', category: 'Maintenance', content: 'Complete operation and maintenance manual for Assembly Line 3 equipment including troubleshooting guides, parts lists, and safety interlocks.', author: 'Engineering Dept', authorImage: '', date: new Date(Date.now() - 259200000).toISOString(), tags: ['manual', 'equipment', 'maintenance'], downloads: 189, url: 'https://docs.guardianai.com/line3' },
+  { id: 'r4', type: 'code', title: 'Incident Reporting Script', category: 'Compliance', content: 'Python automation script for generating incident report summaries from sensor logs and submitting them to the compliance database.', author: 'Data Team', authorImage: '', date: new Date(Date.now() - 345600000).toISOString(), tags: ['python', 'automation', 'reporting'], downloads: 123 },
+  { id: 'r5', type: 'images', title: 'Chemical Handling Guide', category: 'Safety', content: 'Visual guide for proper chemical handling, storage, and disposal procedures including HAZMAT labeling and spill containment protocols.', author: 'Safety Office', authorImage: '', date: new Date(Date.now() - 432000000).toISOString(), tags: ['chemical', 'hazmat', 'safety'], downloads: 445 },
+  { id: 'r6', type: 'notes', title: 'OSHA Compliance Checklist', category: 'Compliance', content: 'Comprehensive OSHA compliance checklist covering workplace safety standards, recordkeeping, training requirements, and inspection preparation.', author: 'Compliance Officer', authorImage: '', date: new Date(Date.now() - 518400000).toISOString(), tags: ['osha', 'compliance', 'inspection'], downloads: 312 },
+  { id: 'r7', type: 'pdfs', title: 'Fire Safety Training Guide', category: 'Training', content: 'Complete fire safety training materials including fire prevention, extinguisher operation, evacuation procedures, and fire warden responsibilities.', author: 'Training Center', authorImage: '', date: new Date(Date.now() - 604800000).toISOString(), tags: ['fire', 'training', 'safety'], downloads: 678 },
+  { id: 'r8', type: 'code', title: 'Sensor Monitoring Dashboard', category: 'Maintenance', content: 'React-based dashboard for real-time monitoring of gas sensors, temperature gauges, and pressure readings across all plant zones.', author: 'Dev Team', authorImage: '', date: new Date(Date.now() - 691200000).toISOString(), tags: ['react', 'sensors', 'monitoring'], downloads: 891 },
+  { id: 'r9', type: 'images', title: 'PPE Compatibility Chart', category: 'Safety', content: 'Detailed reference chart showing required personal protective equipment for each zone and task type with compatibility and rating specifications.', author: 'Safety Dept', authorImage: '', date: new Date(Date.now() - 777600000).toISOString(), tags: ['ppe', 'safety', 'reference'], downloads: 234 },
+  { id: 'r10', type: 'links', title: 'Confined Space Entry Guide', category: 'Training', content: 'Interactive training guide for confined space entry procedures including atmospheric testing, permits, rescue plans, and equipment requirements.', author: 'Training Dept', authorImage: '', date: new Date(Date.now() - 864000000).toISOString(), tags: ['confined-space', 'training', 'safety'], downloads: 156, url: 'https://training.guardianai.com/confined-space' },
+  { id: 'r11', type: 'notes', title: 'Incident Report Template', category: 'Compliance', content: 'Standardized incident report template for documenting workplace incidents, near misses, and hazardous conditions with root cause analysis section.', author: 'Compliance Dept', authorImage: '', date: new Date(Date.now() - 950400000).toISOString(), tags: ['report', 'incident', 'template'], downloads: 89 },
+  { id: 'r12', type: 'pdfs', title: 'Emergency Response Plan', category: 'Emergency', content: 'Facility-wide emergency response plan covering natural disasters, chemical spills, fires, medical emergencies, and active threat scenarios.', author: 'Safety Committee', authorImage: '', date: new Date(Date.now() - 1036800000).toISOString(), tags: ['emergency', 'response', 'plan'], downloads: 723 },
 ];
 
 const typeConfig: Record<string, { icon: React.ElementType; color: string; label: string }> = {
   notes: { icon: FileText, color: 'text-blue-500 bg-blue-500/10', label: 'Notes' },
-  pdfs: { icon: BookOpen, color: 'text-red-500 bg-red-500/10', label: 'PDFs' },
+  pdfs: { icon: Shield, color: 'text-red-500 bg-red-500/10', label: 'PDFs' },
   links: { icon: Link2, color: 'text-emerald-500 bg-emerald-500/10', label: 'Links' },
   code: { icon: Code2, color: 'text-purple-500 bg-purple-500/10', label: 'Code' },
   images: { icon: ImageIcon, color: 'text-amber-500 bg-amber-500/10', label: 'Images' },
@@ -65,7 +65,7 @@ const typeConfig: Record<string, { icon: React.ElementType; color: string; label
 export function ResourcesPage() {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [subjectFilter, setSubjectFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<{ name: string; size: number }[]>([]);
@@ -73,14 +73,14 @@ export function ResourcesPage() {
   const filteredResources = useMemo(() => {
     let result = mockResources;
     if (activeTab !== 'all') result = result.filter(r => r.type === activeTab);
-    if (subjectFilter !== 'all') result = result.filter(r => r.subject === subjectFilter);
+    if (categoryFilter !== 'all') result = result.filter(r => r.category === categoryFilter);
     if (searchQuery) result = result.filter(r =>
       r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
     );
     return result;
-  }, [activeTab, subjectFilter, searchQuery]);
+  }, [activeTab, categoryFilter, searchQuery]);
 
   const tabCounts = useMemo(() => ({
     all: mockResources.length,
@@ -100,7 +100,7 @@ export function ResourcesPage() {
       >
         <div>
           <h1 className="text-3xl font-bold gradient-text">Resources</h1>
-          <p className="text-muted-foreground mt-1">Shared study materials and documents</p>
+          <p className="text-muted-foreground mt-1">Shared safety documents and compliance materials</p>
         </div>
         <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
           <DialogTrigger asChild>
@@ -112,7 +112,7 @@ export function ResourcesPage() {
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Upload Resource</DialogTitle>
-              <DialogDescription>Share study materials with your peers</DialogDescription>
+              <DialogDescription>Share safety documents with your team</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div
@@ -180,14 +180,14 @@ export function ResourcesPage() {
             onChange={e => setSearchQuery(e.target.value)}
           />
         </div>
-        <Select value={subjectFilter} onValueChange={setSubjectFilter}>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
           <SelectTrigger className="w-[160px]">
             <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="All Subjects" />
+            <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Subjects</SelectItem>
-            {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>
       </motion.div>
@@ -228,7 +228,7 @@ export function ResourcesPage() {
                 </div>
                 <h3 className="text-lg font-semibold mb-1">No resources found</h3>
                 <p className="text-muted-foreground text-sm max-w-sm">
-                  {searchQuery || subjectFilter !== 'all'
+                  {searchQuery || categoryFilter !== 'all'
                     ? 'Try adjusting your search or filters'
                     : `No ${activeTab === 'all' ? '' : typeConfig[activeTab as ResourceType]?.label.toLowerCase() || ''} resources yet`}
                 </p>
@@ -257,7 +257,7 @@ export function ResourcesPage() {
                               <div className={cn('p-2 rounded-lg', cfg.color)}>
                                 <Icon className="h-4 w-4" />
                               </div>
-                              <Badge variant="secondary" className="text-[10px]">{resource.subject}</Badge>
+                              <Badge variant="secondary" className="text-[10px]">{resource.category}</Badge>
                             </div>
                             <CardTitle className="text-sm leading-tight">{resource.title}</CardTitle>
                             <CardDescription className="text-xs line-clamp-2">

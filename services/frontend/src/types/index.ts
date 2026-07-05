@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'admin';
+export type UserRole = 'admin' | 'supervisor' | 'safety_officer' | 'worker';
 
 export interface User {
   _id: string;
@@ -6,12 +6,10 @@ export interface User {
   firstName: string;
   lastName: string;
   role: UserRole;
+  department: string;
+  employeeId: string;
   avatar?: string;
-  bio?: string;
-  institution?: string;
-  studyStreak: number;
-  totalStudyHours: number;
-  completedTasks: number;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,33 +30,6 @@ export interface ApiResponse<T = unknown> {
     total: number;
     totalPages: number;
   };
-}
-
-export interface StudyRoom {
-  _id: string;
-  name: string;
-  description: string;
-  subject: string;
-  isPrivate: boolean;
-  password?: string;
-  maxParticipants: number;
-  participants: { user: User; joinedAt: string }[];
-  createdBy: User;
-  isActive: boolean;
-  tags: string[];
-  createdAt: string;
-}
-
-export interface StudySession {
-  _id: string;
-  user: string;
-  room?: string;
-  startTime: string;
-  endTime?: string;
-  duration: number;
-  type: 'focus' | 'pomodoro' | 'group' | 'coding';
-  subject: string;
-  notes?: string;
 }
 
 export interface Task {
@@ -87,37 +58,11 @@ export interface Resource {
   createdAt: string;
 }
 
-export interface StudyAnalytics {
-  daily: { date: string; hours: number; tasks: number; sessions: number }[];
-  weekly: { week: string; hours: number; focus: number; coding: number }[];
-  monthly: { month: string; hours: number; streak: number; completion: number }[];
-  subjects: { subject: string; hours: number; percentage: number }[];
-  pomodoro: { date: string; sessions: number; focusMinutes: number }[];
-  coding: { date: string; languages: Record<string, number> }[];
-}
-
-export interface LeaderboardEntry {
-  user: User;
-  totalHours: number;
-  streak: number;
-  tasksCompleted: number;
-  resourcesShared: number;
-  score: number;
-}
-
-export interface AIMessage {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
-}
-
-export interface CodingSession {
-  _id: string;
-  language: string;
-  code: string;
-  input?: string;
-  output?: string;
-  status: 'running' | 'completed' | 'error';
-  duration: number;
-  createdAt: string;
+export interface SafetyAnalytics {
+  daily: { date: string; incidents: number; inspections: number; hazards: number }[];
+  weekly: { week: string; incidents: number; nearMisses: number; inspections: number }[];
+  monthly: { month: string; incidents: number; safetyScore: number; compliance: number }[];
+  departments: { department: string; incidents: number; riskLevel: number }[];
+  incidents: { date: string; count: number; severity: Record<string, number> }[];
+  inspections: { date: string; completed: number; failed: number }[];
 }

@@ -35,21 +35,21 @@ interface Task {
   createdAt: string;
 }
 
-const categories = ['Study', 'Assignment', 'Project', 'Exam Prep', 'Reading', 'Research', 'Practice'];
+const categories = ['Safety Check', 'Maintenance', 'Inspection', 'Compliance', 'Training', 'Report', 'Emergency Prep'];
 
 const initialTasks: Task[] = [
-  { id: 't1', title: 'Complete Calculus problem set', description: 'Finish problems 1-20 from Chapter 7 on integration techniques', priority: 'high', dueDate: new Date(Date.now() + 86400000).toISOString(), category: 'Assignment', tags: ['calculus', 'math'], column: 'todo', createdAt: new Date(Date.now() - 604800000).toISOString() },
-  { id: 't2', title: 'Review Data Structures notes', description: 'Go over binary trees, hash tables, and graph algorithms', priority: 'medium', dueDate: new Date(Date.now() + 172800000).toISOString(), category: 'Study', tags: ['cs', 'dsa'], column: 'todo', createdAt: new Date(Date.now() - 432000000).toISOString() },
-  { id: 't3', title: 'Write lab report for Chemistry', description: 'Document the organic synthesis experiment results and analysis', priority: 'high', dueDate: new Date(Date.now() + 259200000).toISOString(), category: 'Assignment', tags: ['chemistry', 'lab'], column: 'in_progress', createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: 't4', title: 'Prepare for Physics quiz', description: 'Review electromagnetism chapters and practice problems', priority: 'medium', dueDate: new Date(Date.now() + 43200000).toISOString(), category: 'Exam Prep', tags: ['physics'], column: 'in_progress', createdAt: new Date(Date.now() - 172800000).toISOString() },
-  { id: 't5', title: 'Read Chapter 5 of Biology textbook', description: 'Cell division and genetics - take notes on key concepts', priority: 'low', dueDate: new Date(Date.now() + 345600000).toISOString(), category: 'Reading', tags: ['biology', 'reading'], column: 'todo', createdAt: new Date(Date.now() - 259200000).toISOString() },
-  { id: 't6', title: 'Practice Spanish vocabulary', description: 'Complete 50 new flashcards on language learning app', priority: 'low', dueDate: new Date(Date.now() + 43200000).toISOString(), category: 'Practice', tags: ['spanish', 'languages'], column: 'completed', createdAt: new Date(Date.now() - 604800000).toISOString() },
-  { id: 't7', title: 'Build React project component', description: 'Implement the dashboard grid layout with responsive design', priority: 'high', dueDate: new Date(Date.now() + 518400000).toISOString(), category: 'Project', tags: ['react', 'frontend'], column: 'in_progress', createdAt: new Date(Date.now() - 345600000).toISOString() },
-  { id: 't8', title: 'Research paper outline', description: 'Create outline for term paper on machine learning ethics', priority: 'medium', dueDate: new Date(Date.now() + 604800000).toISOString(), category: 'Research', tags: ['research', 'ml'], column: 'todo', createdAt: new Date(Date.now() - 432000000).toISOString() },
-  { id: 't9', title: 'Complete Python coding challenge', description: 'Solve 5 medium-level problems on dynamic programming', priority: 'medium', dueDate: new Date(Date.now() + 21600000).toISOString(), category: 'Practice', tags: ['python', 'algorithms'], column: 'completed', createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: 't10', title: 'Review Linear Algebra proofs', description: 'Study vector space properties and linear transformation proofs', priority: 'medium', dueDate: new Date(Date.now() + 432000000).toISOString(), category: 'Study', tags: ['math', 'linear-algebra'], column: 'completed', createdAt: new Date(Date.now() - 1209600000).toISOString() },
-  { id: 't11', title: 'Prepare presentation slides', description: 'Create slides for group project on climate change modeling', priority: 'high', dueDate: new Date(Date.now() + 691200000).toISOString(), category: 'Project', tags: ['presentation', 'climate'], column: 'todo', createdAt: new Date(Date.now() - 518400000).toISOString() },
-  { id: 't12', title: 'Submit scholarship application', description: 'Complete and submit the Gates Millennium Scholarship application', priority: 'high', dueDate: new Date(Date.now() - 86400000).toISOString(), category: 'Assignment', tags: ['scholarship', 'application'], column: 'completed', createdAt: new Date(Date.now() - 1209600000).toISOString() },
+  { id: 't1', title: 'Inspect fire extinguishers in Zone B', description: 'Check all fire extinguishers for pressure, damage, and expiration dates', priority: 'high', dueDate: new Date(Date.now() + 86400000).toISOString(), category: 'Safety Check', tags: ['fire', 'equipment'], column: 'todo', createdAt: new Date(Date.now() - 604800000).toISOString() },
+  { id: 't2', title: 'Review safety protocols', description: 'Go over updated OSHA safety protocols for heavy machinery operation', priority: 'medium', dueDate: new Date(Date.now() + 172800000).toISOString(), category: 'Compliance', tags: ['osha', 'protocols'], column: 'todo', createdAt: new Date(Date.now() - 432000000).toISOString() },
+  { id: 't3', title: 'Calibrate gas sensors', description: 'Calibrate all gas detection sensors on Assembly Line 3 and document readings', priority: 'high', dueDate: new Date(Date.now() + 259200000).toISOString(), category: 'Maintenance', tags: ['sensors', 'calibration'], column: 'in_progress', createdAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: 't4', title: 'Update emergency evacuation maps', description: 'Revise evacuation route maps with new exits and assembly points', priority: 'medium', dueDate: new Date(Date.now() + 43200000).toISOString(), category: 'Emergency Prep', tags: ['evacuation', 'safety'], column: 'in_progress', createdAt: new Date(Date.now() - 172800000).toISOString() },
+  { id: 't5', title: 'Inspect safety harnesses', description: 'Check all fall protection harnesses for wear, damage, and proper certification', priority: 'low', dueDate: new Date(Date.now() + 345600000).toISOString(), category: 'Inspection', tags: ['harnesses', 'fall-protection'], column: 'todo', createdAt: new Date(Date.now() - 259200000).toISOString() },
+  { id: 't6', title: 'Complete HAZMAT training module', description: 'Finish online hazardous materials handling certification course', priority: 'low', dueDate: new Date(Date.now() + 43200000).toISOString(), category: 'Training', tags: ['hazmat', 'certification'], column: 'completed', createdAt: new Date(Date.now() - 604800000).toISOString() },
+  { id: 't7', title: 'File weekly incident report', description: 'Compile and submit the weekly safety incident report to management', priority: 'high', dueDate: new Date(Date.now() + 518400000).toISOString(), category: 'Report', tags: ['report', 'documentation'], column: 'in_progress', createdAt: new Date(Date.now() - 345600000).toISOString() },
+  { id: 't8', title: 'Inspect conveyor belt system', description: 'Perform routine inspection of conveyor belt rollers, belts, and emergency stops', priority: 'medium', dueDate: new Date(Date.now() + 604800000).toISOString(), category: 'Maintenance', tags: ['conveyor', 'inspection'], column: 'todo', createdAt: new Date(Date.now() - 432000000).toISOString() },
+  { id: 't9', title: 'Emergency response drill review', description: 'Review and evaluate last emergency drill performance and identify improvements', priority: 'medium', dueDate: new Date(Date.now() + 21600000).toISOString(), category: 'Emergency Prep', tags: ['drill', 'response'], column: 'completed', createdAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: 't10', title: 'Test backup generator', description: 'Run full load test on emergency backup generator and log fuel levels', priority: 'medium', dueDate: new Date(Date.now() + 432000000).toISOString(), category: 'Safety Check', tags: ['generator', 'backup'], column: 'completed', createdAt: new Date(Date.now() - 1209600000).toISOString() },
+  { id: 't11', title: 'Conduct safety walkthrough', description: 'Perform safety walkthrough of Warehouse A and document any hazards', priority: 'high', dueDate: new Date(Date.now() + 691200000).toISOString(), category: 'Inspection', tags: ['walkthrough', 'hazards'], column: 'todo', createdAt: new Date(Date.now() - 518400000).toISOString() },
+  { id: 't12', title: 'Submit compliance audit documentation', description: 'Complete and submit all compliance audit paperwork for Q2 review', priority: 'high', dueDate: new Date(Date.now() - 86400000).toISOString(), category: 'Compliance', tags: ['audit', 'compliance'], column: 'completed', createdAt: new Date(Date.now() - 1209600000).toISOString() },
 ];
 
 const priorityConfig: Record<Priority, { icon: React.ElementType; color: string; label: string }> = {
@@ -74,7 +74,7 @@ export function TasksPage() {
   const [dragTaskId, setDragTaskId] = useState<string | null>(null);
   const [newTask, setNewTask] = useState({
     title: '', description: '', priority: 'medium' as Priority,
-    dueDate: '', category: 'Study', tags: '',
+    dueDate: '', category: 'Safety Check', tags: '',
   });
 
   const filteredTasks = useMemo(() => {
@@ -125,7 +125,7 @@ export function TasksPage() {
     };
     setTasks(prev => [task, ...prev]);
     setShowAddDialog(false);
-    setNewTask({ title: '', description: '', priority: 'medium', dueDate: '', category: 'Study', tags: '' });
+    setNewTask({ title: '', description: '', priority: 'medium', dueDate: '', category: 'Safety Check', tags: '' });
   };
 
   const deleteTask = (taskId: string) => {
@@ -141,7 +141,7 @@ export function TasksPage() {
       >
         <div>
           <h1 className="text-3xl font-bold gradient-text">Tasks</h1>
-          <p className="text-muted-foreground mt-1">Manage your study tasks and assignments</p>
+          <p className="text-muted-foreground mt-1">Manage your safety tasks and inspections</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
@@ -161,7 +161,7 @@ export function TasksPage() {
             <DialogContent className="sm:max-w-[450px]">
               <DialogHeader>
                 <DialogTitle>Add Task</DialogTitle>
-                <DialogDescription>Create a new task for your study plan</DialogDescription>
+                <DialogDescription>Create a new safety task or inspection</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
@@ -251,7 +251,7 @@ export function TasksPage() {
             </SelectContent>
           </Select>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-[140px]"><Tag className="h-4 w-4 mr-2" /><SelectValue placeholder="Category" /></SelectTrigger>
+            <SelectTrigger className="w-[155px]"><Tag className="h-4 w-4 mr-2" /><SelectValue placeholder="Category" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}

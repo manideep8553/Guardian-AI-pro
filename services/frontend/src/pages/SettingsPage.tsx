@@ -35,9 +35,9 @@ export function SettingsPage() {
 
   const [general, setGeneral] = useState({
     name: 'Alex Johnson',
-    email: 'alex.johnson@university.edu',
-    institution: 'State University of Technology',
-    bio: 'Computer Science major passionate about full-stack development.',
+    email: 'alex.johnson@guardianai.com',
+    institution: 'Plant Operations - Zone A',
+    bio: 'Senior Safety Officer responsible for industrial safety operations.',
   });
 
   const [appearance, setAppearance] = useState({
@@ -50,16 +50,16 @@ export function SettingsPage() {
     email: true,
     push: false,
     inApp: true,
-    studyReminders: true,
-    sessionInvites: true,
+    safetyAlerts: true,
+    drillNotifications: true,
     achievementAlerts: true,
   });
 
   const [privacy, setPrivacy] = useState({
     profileVisibility: 'public' as 'public' | 'friends' | 'private',
     showOnlineStatus: true,
-    shareActivity: true,
-    showStudyStats: true,
+    shareSafetyStatus: true,
+    showSafetyStats: true,
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -137,7 +137,7 @@ export function SettingsPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="institution">Institution</Label>
+                  <Label htmlFor="institution">Location / Zone</Label>
                   <Input id="institution" value={general.institution} onChange={e => setGeneral(prev => ({ ...prev, institution: e.target.value }))} />
                 </div>
                 <div className="space-y-2">
@@ -253,9 +253,9 @@ export function SettingsPage() {
                   { id: 'email', label: 'Email Notifications', description: 'Receive notifications via email', icon: Mail },
                   { id: 'push', label: 'Push Notifications', description: 'Receive push notifications on your device', icon: Smartphone },
                   { id: 'inApp', label: 'In-App Notifications', description: 'Show notifications within the app', icon: Bell },
-                  { id: 'studyReminders', label: 'Study Reminders', description: 'Get reminded about study sessions', icon: Volume2 },
-                  { id: 'sessionInvites', label: 'Session Invites', description: 'Notify when someone invites you to a session', icon: User },
-                  { id: 'achievementAlerts', label: 'Achievement Alerts', description: 'Celebrate when you unlock achievements', icon: Check },
+                  { id: 'safetyAlerts', label: 'Safety Alerts', description: 'Get alerted about safety incidents and hazards', icon: Volume2 },
+                  { id: 'drillNotifications', label: 'Drill Notifications', description: 'Notify when emergency drills are scheduled', icon: User },
+                  { id: 'achievementAlerts', label: 'Achievement Alerts', description: 'Celebrate when you unlock safety badges', icon: Check },
                 ].map((item) => (
                   <div key={item.id} className="flex items-center justify-between py-3">
                     <div className="flex items-start gap-3">
@@ -308,7 +308,7 @@ export function SettingsPage() {
                     >
                       <p className="text-sm font-medium capitalize">{vis}</p>
                       <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {vis === 'public' ? 'Everyone' : vis === 'friends' ? 'Study Partners' : 'Only you'}
+                        {vis === 'public' ? 'Everyone' : vis === 'friends' ? 'Team Members' : 'Only you'}
                       </p>
                     </button>
                   ))}
@@ -331,18 +331,18 @@ export function SettingsPage() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Share Study Activity</Label>
-                    <p className="text-xs text-muted-foreground">Share your study stats on your profile</p>
+                    <Label>Share Safety Status</Label>
+                    <p className="text-xs text-muted-foreground">Share your safety status on your profile</p>
                   </div>
-                  <Switch checked={privacy.shareActivity} onCheckedChange={v => setPrivacy(prev => ({ ...prev, shareActivity: v }))} />
+                  <Switch checked={privacy.shareSafetyStatus} onCheckedChange={v => setPrivacy(prev => ({ ...prev, shareSafetyStatus: v }))} />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Show Study Stats</Label>
-                    <p className="text-xs text-muted-foreground">Display your achievements and progress</p>
+                    <Label>Show Safety Stats</Label>
+                    <p className="text-xs text-muted-foreground">Display your badges and safety metrics</p>
                   </div>
-                  <Switch checked={privacy.showStudyStats} onCheckedChange={v => setPrivacy(prev => ({ ...prev, showStudyStats: v }))} />
+                  <Switch checked={privacy.showSafetyStats} onCheckedChange={v => setPrivacy(prev => ({ ...prev, showSafetyStats: v }))} />
                 </div>
                 <div className="flex justify-end">
                   <Button onClick={() => showToast('Privacy settings saved')} className="gap-1.5">
@@ -450,7 +450,7 @@ export function SettingsPage() {
                   <div className="flex-1">
                     <p className="text-sm font-medium text-red-500">Delete Account</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Once you delete your account, all your data, study sessions, and resources will be permanently removed. This action cannot be undone.
+                      Once you delete your account, all your data, safety logs, and incident reports will be permanently removed. This action cannot be undone.
                     </p>
                     <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                       <DialogTrigger asChild>

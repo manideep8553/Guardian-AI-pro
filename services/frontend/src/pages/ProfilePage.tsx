@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Camera, Clock, Flame, Target, Upload, Award,
+  Camera, Clock, Target, Upload, Award,
   Activity, Edit3, Calendar, MapPin,
-  Mail, BookOpen,
+  Mail, Shield,
   CheckCircle, Star, Trophy, Zap, Crown
 } from 'lucide-react';
 import {
@@ -22,38 +22,38 @@ import {
 import { cn, getInitials, timeAgo } from '../lib/utils';
 
 const weeklyData = [
-  { day: 'Mon', hours: 4.2 }, { day: 'Tue', hours: 3.8 }, { day: 'Wed', hours: 5.1 },
-  { day: 'Thu', hours: 2.9 }, { day: 'Fri', hours: 6.0 }, { day: 'Sat', hours: 3.5 },
-  { day: 'Sun', hours: 4.8 },
+  { day: 'Mon', score: 85 }, { day: 'Tue', score: 92 }, { day: 'Wed', score: 78 },
+  { day: 'Thu', score: 95 }, { day: 'Fri', score: 88 }, { day: 'Sat', score: 90 },
+  { day: 'Sun', score: 82 },
 ];
 
 const achievements = [
-  { title: 'Early Bird', description: 'Studied before 6 AM for 7 days straight', icon: Star, color: 'text-amber-500', bg: 'bg-amber-500/10', unlocked: true },
-  { title: 'Code Master', description: 'Completed 50 coding challenges', icon: Trophy, color: 'text-purple-500', bg: 'bg-purple-500/10', unlocked: true },
-  { title: 'Streak King', description: 'Maintained a 30-day study streak', icon: Crown, color: 'text-blue-500', bg: 'bg-blue-500/10', unlocked: true },
-  { title: 'Math Wizard', description: 'Scored 100% on 10 math quizzes', icon: Zap, color: 'text-emerald-500', bg: 'bg-emerald-500/10', unlocked: true },
-  { title: 'Collaborator', description: 'Joined 20 study group sessions', icon: Award, color: 'text-pink-500', bg: 'bg-pink-500/10', unlocked: false },
-  { title: 'Resource Guru', description: 'Shared 50 study resources', icon: BookOpen, color: 'text-cyan-500', bg: 'bg-cyan-500/10', unlocked: false },
-  { title: 'Night Owl', description: 'Studied past midnight for 14 days', icon: Star, color: 'text-indigo-500', bg: 'bg-indigo-500/10', unlocked: false },
-  { title: 'Quiz Champion', description: 'Won 5 weekly quiz competitions', icon: Trophy, color: 'text-orange-500', bg: 'bg-orange-500/10', unlocked: false },
+  { title: '100 Days Safe', description: 'Maintained zero incidents for 100 consecutive days', icon: Star, color: 'text-amber-500', bg: 'bg-amber-500/10', unlocked: true },
+  { title: 'Perfect Inspection Record', description: 'Completed 50 inspections without a single miss', icon: Trophy, color: 'text-purple-500', bg: 'bg-purple-500/10', unlocked: true },
+  { title: 'Safety Streak', description: 'Maintained a 30-day safety streak', icon: Crown, color: 'text-blue-500', bg: 'bg-blue-500/10', unlocked: true },
+  { title: 'Rapid Responder', description: 'Responded to 10 emergency alerts within 2 minutes', icon: Zap, color: 'text-emerald-500', bg: 'bg-emerald-500/10', unlocked: true },
+  { title: 'Compliance Champion', description: 'Passed all compliance audits for 6 months', icon: Award, color: 'text-pink-500', bg: 'bg-pink-500/10', unlocked: false },
+  { title: 'Trainer Elite', description: 'Conducted 20 safety training sessions', icon: Shield, color: 'text-cyan-500', bg: 'bg-cyan-500/10', unlocked: false },
+  { title: 'Night Watch', description: 'Completed night shift safety rounds for 14 days', icon: Star, color: 'text-indigo-500', bg: 'bg-indigo-500/10', unlocked: false },
+  { title: 'Zero Harm', description: 'Achieved zero harm across all zones for a quarter', icon: Trophy, color: 'text-orange-500', bg: 'bg-orange-500/10', unlocked: false },
 ];
 
 const recentActivity = [
-  { type: 'study', text: 'Completed Calculus problem set', time: new Date(Date.now() - 1800000).toISOString(), icon: BookOpen },
-  { type: 'achieve', text: 'Unlocked "Code Master" achievement', time: new Date(Date.now() - 7200000).toISOString(), icon: Trophy },
-  { type: 'task', text: 'Submitted research paper outline', time: new Date(Date.now() - 14400000).toISOString(), icon: CheckCircle },
-  { type: 'session', text: 'Joined Data Structures study room', time: new Date(Date.now() - 28800000).toISOString(), icon: Activity },
-  { type: 'resource', text: 'Uploaded Physics formula sheet', time: new Date(Date.now() - 57600000).toISOString(), icon: Upload },
-  { type: 'task', text: 'Completed Spanish vocabulary practice', time: new Date(Date.now() - 115200000).toISOString(), icon: CheckCircle },
+  { type: 'resolve', text: 'Resolved gas leak in Zone A', time: new Date(Date.now() - 1800000).toISOString(), icon: Shield },
+  { type: 'achieve', text: 'Unlocked "100 Days Safe" achievement', time: new Date(Date.now() - 7200000).toISOString(), icon: Trophy },
+  { type: 'inspection', text: 'Completed safety inspection at Plant 2', time: new Date(Date.now() - 14400000).toISOString(), icon: CheckCircle },
+  { type: 'drill', text: 'Participated in emergency evacuation drill', time: new Date(Date.now() - 28800000).toISOString(), icon: Activity },
+  { type: 'report', text: 'Filed incident report for minor equipment malfunction', time: new Date(Date.now() - 57600000).toISOString(), icon: Upload },
+  { type: 'training', text: 'Completed HAZMAT refresher certification', time: new Date(Date.now() - 115200000).toISOString(), icon: CheckCircle },
 ];
 
 export function ProfilePage() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [profile, setProfile] = useState({
     name: 'Alex Johnson',
-    email: 'alex.johnson@university.edu',
-    institution: 'State University of Technology',
-    bio: 'Computer Science major passionate about full-stack development and machine learning. Love collaborating with fellow students on challenging projects.',
+    email: 'alex.johnson@guardianai.com',
+    institution: 'Plant Operations - Zone A',
+    bio: 'Senior Safety Officer with 8 years of experience in industrial safety management. Certified in HAZMAT handling, fire safety, and emergency response.',
   });
 
   const [editForm, setEditForm] = useState({ ...profile });
@@ -64,10 +64,10 @@ export function ProfilePage() {
   };
 
   const statsCards = [
-    { title: 'Total Study Hours', value: '142.5', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    { title: 'Current Streak', value: '12 days', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-    { title: 'Tasks Completed', value: '48', icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { title: 'Resources Shared', value: '23', icon: Upload, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { title: 'Total Hours On Duty', value: '1,420', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { title: 'Safety Score', value: '96', icon: Shield, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+    { title: 'Incidents Resolved', value: '48', icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    { title: 'Inspections Completed', value: '123', icon: Upload, color: 'text-purple-500', bg: 'bg-purple-500/10' },
   ];
 
   return (
@@ -122,7 +122,7 @@ export function ProfilePage() {
                           <Input value={editForm.email} onChange={e => setEditForm(prev => ({ ...prev, email: e.target.value }))} />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Institution</label>
+                          <label className="text-sm font-medium">Location / Zone</label>
                           <Input value={editForm.institution} onChange={e => setEditForm(prev => ({ ...prev, institution: e.target.value }))} />
                         </div>
                         <div className="space-y-2">
@@ -183,7 +183,7 @@ export function ProfilePage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Activity className="h-4 w-4 text-blue-500" />
-                This Week&apos;s Study Hours
+                This Week&apos;s Safety Score
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -201,7 +201,7 @@ export function ProfilePage() {
                         fontSize: '12px',
                       }}
                     />
-                    <Bar dataKey="hours" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="score" fill="#10b981" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -218,7 +218,7 @@ export function ProfilePage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Award className="h-4 w-4 text-amber-500" />
-                Achievements
+                Badges
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -277,15 +277,17 @@ export function ProfilePage() {
                   <div className={cn(
                     'p-1.5 rounded-md',
                     act.type === 'achieve' ? 'bg-amber-500/10' :
-                    act.type === 'study' ? 'bg-blue-500/10' :
-                    act.type === 'task' ? 'bg-emerald-500/10' :
+                    act.type === 'resolve' ? 'bg-blue-500/10' :
+                    act.type === 'inspection' ? 'bg-emerald-500/10' :
+                    act.type === 'report' ? 'bg-purple-500/10' :
                     'bg-muted'
                   )}>
                     <act.icon className={cn(
                       'h-4 w-4',
                       act.type === 'achieve' ? 'text-amber-500' :
-                      act.type === 'study' ? 'text-blue-500' :
-                      act.type === 'task' ? 'text-emerald-500' :
+                      act.type === 'resolve' ? 'text-blue-500' :
+                      act.type === 'inspection' ? 'text-emerald-500' :
+                      act.type === 'report' ? 'text-purple-500' :
                       'text-muted-foreground'
                     )} />
                   </div>

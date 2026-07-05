@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  GraduationCap,
+  Shield,
   LayoutDashboard,
-  DoorOpen,
-  Code2,
-  PenTool,
-  BookOpen,
+  AlertTriangle,
+  HardHat,
+  Factory,
+  Cpu,
+  BarChart3,
   Calendar,
   CheckSquare,
-  BarChart3,
+  BookOpen,
   MessageSquare,
   UserCircle,
   Settings,
@@ -33,13 +34,14 @@ interface SidebarProps {
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/study-rooms', icon: DoorOpen, label: 'Study Rooms' },
-  { to: '/code-editor', icon: Code2, label: 'Code Editor' },
-  { to: '/whiteboard', icon: PenTool, label: 'Whiteboard' },
-  { to: '/resources', icon: BookOpen, label: 'Resources' },
+  { to: '/incidents', icon: AlertTriangle, label: 'Incidents' },
+  { to: '/workers', icon: HardHat, label: 'Workers' },
+  { to: '/factories', icon: Factory, label: 'Factories' },
+  { to: '/devices', icon: Cpu, label: 'Devices' },
+  { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/calendar', icon: Calendar, label: 'Calendar' },
   { to: '/tasks', icon: CheckSquare, label: 'Tasks' },
-  { to: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { to: '/resources', icon: BookOpen, label: 'Resources' },
   { to: '/chat', icon: MessageSquare, label: 'Chat' },
   { to: '/profile', icon: UserCircle, label: 'Profile' },
   { to: '/settings', icon: Settings, label: 'Settings' },
@@ -113,10 +115,10 @@ export function Sidebar({ isExpanded, onToggle, isMobileOpen, onMobileClose }: S
             isExpanded ? 'gap-3 px-6' : 'justify-center px-0',
           )}
         >
-          <GraduationCap className="h-7 w-7 shrink-0 text-primary" />
+          <Shield className="h-7 w-7 shrink-0 text-primary" />
           {isExpanded && (
-            <span className="text-lg font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent whitespace-nowrap">
-              StudyRoom
+            <span className="text-lg font-bold bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent whitespace-nowrap">
+              GuardianAI
             </span>
           )}
         </div>
@@ -208,9 +210,9 @@ export function Sidebar({ isExpanded, onToggle, isMobileOpen, onMobileClose }: S
           >
             <div className="flex h-full flex-col">
               <div className="flex items-center gap-3 border-b border-border h-16 shrink-0 px-6">
-                <GraduationCap className="h-7 w-7 shrink-0 text-primary" />
-                <span className="text-lg font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
-                  StudyRoom
+                <Shield className="h-7 w-7 shrink-0 text-primary" />
+                <span className="text-lg font-bold bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">
+                  GuardianAI
                 </span>
               </div>
 

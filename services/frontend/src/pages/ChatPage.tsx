@@ -36,12 +36,11 @@ interface Conversation {
 function generateMessages(convId: string, _name: string): ChatMessage[] {
   const now = Date.now();
   const msgTexts: Record<string, string[]> = {
-    c1: ['Hey, are you joining the study session tonight?', 'Yes, I\'ll be there! What time?', '7 PM in the usual room', 'Perfect, see you then!', 'I\'ll bring the latest notes too'],
-    c2: ['Did you finish the calculus assignment?', 'Almost done, just struggling with the last problem', 'Want me to explain it?', 'That would be great!', 'Let me share my screen in the study room'],
-    c3: ['The Physics exam is next week', 'I know, I\'m starting to review today', 'Want to form a study group?', 'Great idea! I know a few others who might join'],
-    c4: ['Can you review my essay?', 'Sure, send it over!', 'Thanks! I\'ll email it to you', 'Got it, will review tonight'],
-    c5: ['Check out this new resource I found', 'Looks really helpful!', 'It covers all the topics we need', 'Adding it to our shared resources'],
-    c6: ['Are we still on for the chemistry lab?', 'Yes, I\'ll meet you at the lab entrance', 'Bring the safety goggles!', 'Got them, see you at 2 PM'],
+    c1: ['Gas sensor alert in Zone C', 'Acknowledged, sending a team now', 'Reading shows elevated CO levels', 'Evacuate the area immediately', 'Zone C evacuated, team is investigating'],
+    c2: ['Maintenance scheduled for Line 3', 'What time is the shutdown?', '14:00 hours,预计需要2小时', 'I will notify the shift supervisor', 'Line 3 maintenance prep complete'],
+    c3: ['Safety briefing at 08:00 tomorrow', 'Roger that, all crew will attend', 'New HAZMAT protocols to cover', 'I will prepare the materials', 'Briefing room will be ready'],
+    c4: ['Emergency drill results are in', 'How did Zone A perform?', 'Evacuation time was 4:30 - within target', 'Good, share the full report', 'Will distribute by end of shift'],
+    c5: ['Control Room copy, fire alarm test at noon', 'Copy that, testing all zones', 'Verified comms with all fire wardens', 'Systems are go for test', 'Acknowledged, standing by'],
   };
   const texts = msgTexts[convId] || msgTexts.c1;
   return texts.map((text, i) => ({
@@ -54,12 +53,12 @@ function generateMessages(convId: string, _name: string): ChatMessage[] {
 }
 
 const mockConversations: Conversation[] = [
-  { id: 'c1', name: 'Alice Chen', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice', isOnline: true, lastMessage: 'I\'ll bring the latest notes too', lastMessageTime: new Date(Date.now() - 300000).toISOString(), unread: 2, isTyping: false, messages: [] },
-  { id: 'c2', name: 'Bob Smith', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob', isOnline: true, lastMessage: 'Let me share my screen in the study room', lastMessageTime: new Date(Date.now() - 1800000).toISOString(), unread: 0, isTyping: true, messages: [] },
-  { id: 'c3', name: 'Study Group Alpha', image: '', isOnline: false, lastMessage: 'I know a few others who might join', lastMessageTime: new Date(Date.now() - 3600000).toISOString(), unread: 5, isTyping: false, messages: [] },
-  { id: 'c4', name: 'Carol Davis', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carol', isOnline: false, lastMessage: 'Got it, will review tonight', lastMessageTime: new Date(Date.now() - 7200000).toISOString(), unread: 0, isTyping: false, messages: [] },
-  { id: 'c5', name: 'Dan Wilson', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Dan', isOnline: true, lastMessage: 'Adding it to our shared resources', lastMessageTime: new Date(Date.now() - 14400000).toISOString(), unread: 1, isTyping: false, messages: [] },
-  { id: 'c6', name: 'Eve Martin', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Eve', isOnline: false, lastMessage: 'See you at 2 PM', lastMessageTime: new Date(Date.now() - 28800000).toISOString(), unread: 0, isTyping: false, messages: [] },
+  { id: 'c1', name: 'Control Room', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Control', isOnline: true, lastMessage: 'Zone C evacuated, team is investigating', lastMessageTime: new Date(Date.now() - 300000).toISOString(), unread: 2, isTyping: false, messages: [] },
+  { id: 'c2', name: 'Safety Team Alpha', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alpha', isOnline: true, lastMessage: 'Line 3 maintenance prep complete', lastMessageTime: new Date(Date.now() - 1800000).toISOString(), unread: 0, isTyping: true, messages: [] },
+  { id: 'c3', name: 'Maintenance Crew', image: '', isOnline: false, lastMessage: 'Briefing room will be ready', lastMessageTime: new Date(Date.now() - 3600000).toISOString(), unread: 5, isTyping: false, messages: [] },
+  { id: 'c4', name: 'Zone A Operators', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ZoneA', isOnline: false, lastMessage: 'Will distribute by end of shift', lastMessageTime: new Date(Date.now() - 7200000).toISOString(), unread: 0, isTyping: false, messages: [] },
+  { id: 'c5', name: 'Emergency Response', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emergency', isOnline: true, lastMessage: 'Acknowledged, standing by', lastMessageTime: new Date(Date.now() - 14400000).toISOString(), unread: 1, isTyping: false, messages: [] },
+  { id: 'c6', name: 'Eve Martin - Safety Officer', image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Eve', isOnline: false, lastMessage: 'Inspection reports ready for review', lastMessageTime: new Date(Date.now() - 28800000).toISOString(), unread: 0, isTyping: false, messages: [] },
 ];
 
 mockConversations.forEach(conv => {
@@ -123,7 +122,7 @@ export function ChatPage() {
         className="hidden sm:block px-4 sm:px-0 pb-4"
       >
         <h1 className="text-3xl font-bold gradient-text">Messages</h1>
-        <p className="text-muted-foreground mt-1">Chat with study partners and groups</p>
+        <p className="text-muted-foreground mt-1">Chat with safety teams and operators</p>
       </motion.div>
 
       <div className="flex h-full gap-0 sm:gap-4">
@@ -169,7 +168,7 @@ export function ChatPage() {
                           'text-xs',
                           conv.id === 'c3' && 'bg-blue-500/20 text-blue-500'
                         )}>
-                          {conv.id === 'c3' ? 'SG' : getInitials(conv.name)}
+                          {conv.id === 'c3' ? 'MC' : getInitials(conv.name)}
                         </AvatarFallback>
                       </Avatar>
                       <span className={cn(
