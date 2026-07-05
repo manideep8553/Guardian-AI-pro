@@ -5,14 +5,14 @@ EXPOSE 3000
 FROM base AS development
 ENV NODE_ENV=development
 COPY package.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 USER node
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
 
 FROM base AS build
 COPY package.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 RUN npm run build
 

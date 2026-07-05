@@ -8,6 +8,7 @@ ENV NODE_ENV=development
 COPY package.json tsconfig.json ./
 RUN npm install
 COPY src ./src
+RUN mkdir -p /app/logs && chown node:node /app/logs
 USER node
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["npm", "run", "dev"]
@@ -23,6 +24,7 @@ ENV NODE_ENV=production
 COPY package.json ./
 RUN npm install --only=production
 COPY --from=build /app/dist ./dist
+RUN mkdir -p /app/logs && chown node:node /app/logs
 USER node
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "dist/server.js"]

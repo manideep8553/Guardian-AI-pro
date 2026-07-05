@@ -25,5 +25,6 @@ export function getRedis(): Redis {
 
 export async function connectRedis(): Promise<void> {
   const client = getRedis();
+  if (client.status === 'connecting' || client.status === 'ready') return;
   await client.connect();
 }
