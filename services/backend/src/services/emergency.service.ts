@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
 import { ApiError } from '../utils/ApiError';
+import mongoose from 'mongoose';
 import { EmergencyEvent, IEmergencyEvent } from '../models/EmergencyEvent';
 import { Incident } from '../models/Incident';
 import { Worker } from '../models/Worker';
@@ -184,7 +185,7 @@ export async function triggerEmergencyResponse(params: {
       triggeredBy: params.triggeredBy,
     });
     if (incidentId) {
-      emergencyDoc.incidentId = incidentId as any;
+      emergencyDoc.incidentId = new mongoose.Types.ObjectId(incidentId);
       await emergencyDoc.save();
     }
   }
@@ -209,7 +210,7 @@ export async function acknowledgeEmergency(emergencyId: string, userId: string):
   const emergency = await EmergencyEvent.findById(emergencyId);
   if (!emergency) throw new ApiError(httpStatus.NOT_FOUND, 'Emergency event not found');
 
-  emergency.acknowledgedBy = userId as any;
+  emergency.acknowledgedBy = new mongoose.Types.ObjectId(userId);
   emergency.acknowledgedAt = new Date();
   emergency.status = EmergencyStatus.ACKNOWLEDGED;
   await emergency.save();
@@ -225,7 +226,7 @@ export async function resolveEmergency(emergencyId: string, userId: string): Pro
   const emergency = await EmergencyEvent.findById(emergencyId);
   if (!emergency) throw new ApiError(httpStatus.NOT_FOUND, 'Emergency event not found');
 
-  emergency.resolvedBy = userId as any;
+  emergency.resolvedBy = new mongoose.Types.ObjectId(userId);
   emergency.resolvedAt = new Date();
   emergency.status = EmergencyStatus.RESOLVED;
   await emergency.save();

@@ -120,7 +120,7 @@ export const markAttendance = catchAsync(async (req: IAuthRequest, res: Response
 export const getAttendance = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['worker', 'status', 'startDate', 'endDate']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await workerService.getAttendance({ ...filter, ...parsePaginationQuery(options) } as any);
+  const result = await workerService.getAttendance({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,

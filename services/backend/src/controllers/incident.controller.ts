@@ -22,7 +22,7 @@ export const createIncident = catchAsync(async (req: IAuthRequest, res: Response
 export const getIncidents = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['status', 'severity', 'type']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await incidentService.getIncidents({ ...filter, ...parsePaginationQuery(options) } as any);
+  const result = await incidentService.getIncidents({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,
