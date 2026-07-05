@@ -1,11 +1,9 @@
-version: "3.9"
-
 x-common-vars: &common-vars
-  NODE_ENV: ${NODE_ENV:-development}
+  NODE_ENV: ${NODE_ENV:-production}
   MONGODB_URI: ${MONGODB_URI:-mongodb://mongodb:27017/guardianai}
   REDIS_URL: ${REDIS_URL:-redis://redis:6379}
-  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-dev-access-secret-change-in-production}
-  JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-in-production}
+  JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+  JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
   JWT_ACCESS_EXPIRY: ${JWT_ACCESS_EXPIRY:-15m}
   JWT_REFRESH_EXPIRY: ${JWT_REFRESH_EXPIRY:-7d}
   LOG_LEVEL: ${LOG_LEVEL:-info}
@@ -23,6 +21,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    networks:
+      - guardianai
 
   redis:
     image: redis:7-alpine
@@ -36,16 +37,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    networks:
+      - guardianai
 
   backend:
     build:
       context: ./services/backend
-      target: development
+      target: ${NODE_ENV:-production}
+    restart: unless-stopped
     ports:
       - "5000:5000"
-    volumes:
-      - ./services/backend/src:/app/src
-      - /app/node_modules
     environment:
       <<: *common-vars
       PORT: 5000
@@ -55,8 +57,59 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: npm run dev
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - guardianai
+
+  frontend:
+    build:
+      context: ./services/frontend
+      target: production
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - guardianai
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      frontend:
+        condition: service_started
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - guardianai
 
 volumes:
   mongodb_data:
   redis_data:
+
+networks:
+  guardianai:
+    driver: bridge

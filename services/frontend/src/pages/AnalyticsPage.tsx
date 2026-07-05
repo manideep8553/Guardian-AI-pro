@@ -1,371 +1,451 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Button } from '../components/ui/button';
+import {
+  TrendingUp, Clock, Zap, Target, Award, Download,
+  Flame, Calendar, Brain, Activity, BarChart3, PieChart
+} from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, AreaChart, Area,
-  PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Legend,
+  PieChart as RePieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
-import {
-  TrendingUp, Activity, Shield, BarChart3, PieChart as PieChartIcon,
-  Cpu, Zap, Download,
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { cn } from '../lib/utils';
 
-const container = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } };
-const item = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
-
-const chartTooltipStyle = {
-  contentStyle: { background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' },
-  labelStyle: { color: 'hsl(var(--foreground))' },
-};
-
-const incidentTrendData = [
-  { day: 'Jun 6', low: 3, medium: 2, high: 1, critical: 0 },
-  { day: 'Jun 8', low: 2, medium: 3, high: 2, critical: 1 },
-  { day: 'Jun 10', low: 4, medium: 1, high: 0, critical: 0 },
-  { day: 'Jun 12', low: 1, medium: 4, high: 2, critical: 1 },
-  { day: 'Jun 14', low: 3, medium: 2, high: 3, critical: 0 },
-  { day: 'Jun 16', low: 2, medium: 3, high: 1, critical: 2 },
-  { day: 'Jun 18', low: 5, medium: 2, high: 2, critical: 0 },
-  { day: 'Jun 20', low: 3, medium: 4, high: 1, critical: 1 },
-  { day: 'Jun 22', low: 2, medium: 1, high: 3, critical: 2 },
-  { day: 'Jun 24', low: 4, medium: 3, high: 0, critical: 0 },
-  { day: 'Jun 26', low: 1, medium: 2, high: 2, critical: 1 },
-  { day: 'Jun 28', low: 3, medium: 3, high: 1, critical: 0 },
-  { day: 'Jun 30', low: 2, medium: 2, high: 3, critical: 1 },
-  { day: 'Jul 2', low: 4, medium: 1, high: 1, critical: 0 },
-  { day: 'Jul 4', low: 2, medium: 3, high: 2, critical: 0 },
+const dateRanges = [
+  { value: '7d', label: '7D' },
+  { value: '30d', label: '30D' },
+  { value: '3m', label: '3M' },
+  { value: '6m', label: '6M' },
+  { value: '1y', label: '1Y' },
 ];
 
-const highRiskZones = [
-  { zone: 'Chemical Storage', risk: 85 },
-  { zone: 'Assembly Line 3', risk: 72 },
-  { zone: 'Waste Disposal', risk: 65 },
-  { zone: 'Electrical Room B', risk: 58 },
-  { zone: 'Warehouse C', risk: 45 },
-  { zone: 'Lab B', risk: 38 },
-];
+function generateDailyData(days: number) {
+  const data: { date: string; hours: number; focus: number; breaks: number }[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    data.push({
+      date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      hours: Math.round((Math.random() * 4 + 0.5) * 10) / 10,
+      focus: Math.round((Math.random() * 3 + 0.5) * 10) / 10,
+      breaks: Math.round(Math.random() * 2 * 10) / 10,
+    });
+  }
+  return data;
+}
 
-const workerScores = [
-  { name: 'Alice M.', score: 98, dept: 'Lab' },
-  { name: 'Bob K.', score: 95, dept: 'Production' },
-  { name: 'Carol S.', score: 92, dept: 'Assembly' },
-  { name: 'David L.', score: 34, dept: 'Warehouse' },
-  { name: 'Eve R.', score: 28, dept: 'Maintenance' },
-  { name: 'Frank W.', score: 22, dept: 'Assembly' },
-];
+function generateSubjectData() {
+  return [
+    { subject: 'Math', hours: 28.5, color: '#6366f1' },
+    { subject: 'CS', hours: 35.2, color: '#3b82f6' },
+    { subject: 'Physics', hours: 18.7, color: '#10b981' },
+    { subject: 'Chemistry', hours: 12.3, color: '#f59e0b' },
+    { subject: 'Languages', hours: 8.1, color: '#ef4444' },
+    { subject: 'Biology', hours: 6.4, color: '#8b5cf6' },
+  ];
+}
 
-const complianceByDept = [
-  { name: 'Production', value: 94 },
-  { name: 'Assembly', value: 88 },
-  { name: 'Warehouse', value: 76 },
-  { name: 'Lab', value: 96 },
-  { name: 'Maintenance', value: 82 },
-];
+function generateDistributionData() {
+  return [
+    { name: 'Study', value: 65, color: '#6366f1' },
+    { name: 'Coding', value: 20, color: '#3b82f6' },
+    { name: 'Break', value: 15, color: '#10b981' },
+  ];
+}
 
-const pieColors = ['#22c55e', '#eab308', '#f97316', '#3b82f6', '#8b5cf6'];
+function generateHeatmapData() {
+  const data: { date: string; count: number; dayOfWeek: number; week: number }[] = [];
+  const today = new Date();
+  for (let i = 364; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    data.push({
+      date: d.toISOString().split('T')[0],
+      count: Math.floor(Math.random() * 5),
+      dayOfWeek: d.getDay(),
+      week: Math.floor(i / 7),
+    });
+  }
+  return data;
+}
 
-const aiMetrics = [
-  { day: 'Week 1', accuracy: 94, precision: 91, recall: 89 },
-  { day: 'Week 2', accuracy: 95, precision: 92, recall: 90 },
-  { day: 'Week 3', accuracy: 93, precision: 90, recall: 88 },
-  { day: 'Week 4', accuracy: 96, precision: 93, recall: 91 },
-  { day: 'Week 5', accuracy: 95, precision: 94, recall: 92 },
-  { day: 'Week 6', accuracy: 97, precision: 95, recall: 93 },
-];
-
-const equipmentHealth = [
-  { name: 'Conveyors', health: 92 },
-  { name: 'Robotic Arms', health: 88 },
-  { name: 'Sensors', health: 96 },
-  { name: 'HVAC', health: 74 },
-  { name: 'Safety Gear', health: 68 },
-  { name: 'Electrical', health: 81 },
-];
-
-const productivityData = [
-  { month: 'Jan', output: 88, efficiency: 85, safety: 90 },
-  { month: 'Feb', output: 85, efficiency: 82, safety: 87 },
-  { month: 'Mar', output: 90, efficiency: 88, safety: 92 },
-  { month: 'Apr', output: 87, efficiency: 86, safety: 89 },
-  { month: 'May', output: 92, efficiency: 90, safety: 94 },
-  { month: 'Jun', output: 91, efficiency: 89, safety: 93 },
-];
-
-const sections = [
-  { key: 'incidents', label: 'Incident Trends', icon: TrendingUp },
-  { key: 'zones', label: 'High-Risk Zones', icon: Activity },
-  { key: 'workers', label: 'Worker Scores', icon: BarChart3 },
-  { key: 'compliance', label: 'Compliance Rate', icon: PieChartIcon },
-  { key: 'ai', label: 'AI Accuracy', icon: Cpu },
-  { key: 'equipment', label: 'Equipment Health', icon: Zap },
-  { key: 'productivity', label: 'Productivity', icon: Shield },
-] as const;
-
-type SectionKey = typeof sections[number]['key'];
+const weekDays = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
 export function AnalyticsPage() {
-  const [activeSection, setActiveSection] = useState<SectionKey>('incidents');
+  const [selectedRange, setSelectedRange] = useState('30d');
+  const dailyData = useMemo(() => {
+    const dayMap: Record<string, number> = { '7d': 7, '30d': 30, '3m': 90, '6m': 180, '1y': 365 };
+    return generateDailyData(dayMap[selectedRange] || 30);
+  }, [selectedRange]);
+  const subjectData = generateSubjectData();
+  const distributionData = generateDistributionData();
+  const heatmapData = useMemo(() => generateHeatmapData(), []);
+
+  const stats = [
+    { title: 'Total Hours', value: '142.5', icon: Clock, color: 'text-blue-500', bg: 'bg-blue-500/10', change: '+12%' },
+    { title: 'Avg Daily', value: '3.8h', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10', change: '+5%' },
+    { title: 'Current Streak', value: '12 days', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10', change: '+3' },
+    { title: 'Tasks Done', value: '48', icon: Target, color: 'text-purple-500', bg: 'bg-purple-500/10', change: '+8' },
+    { title: 'Sessions', value: '86', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-500/10', change: '+15%' },
+  ];
+
+
+
+  const streakMetrics = [
+    { label: 'Current Streak', value: '12 days', icon: Flame, color: 'text-orange-500' },
+    { label: 'Longest Streak', value: '24 days', icon: Award, color: 'text-purple-500' },
+    { label: 'This Week', value: '21.5h', icon: Clock, color: 'text-blue-500' },
+  ];
+
+  const productivityScore = 78;
 
   return (
-    <motion.div className="space-y-6" variants={container} initial="hidden" animate="visible">
-      <motion.div variants={item}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-white">Analytics</h2>
-            <p className="text-muted-foreground">Comprehensive safety and performance analytics</p>
+    <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+      >
+        <div>
+          <h1 className="text-3xl font-bold gradient-text">Analytics</h1>
+          <p className="text-muted-foreground mt-1">Track your study patterns and productivity</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
+            {dateRanges.map(range => (
+              <Button
+                key={range.value}
+                variant={selectedRange === range.value ? 'default' : 'ghost'}
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => setSelectedRange(range.value)}
+              >
+                {range.label}
+              </Button>
+            ))}
           </div>
-          <Button>
-            <Download className="mr-2 h-4 w-4" />
-            Export Data
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Download className="h-4 w-4" /> Export
           </Button>
         </div>
       </motion.div>
 
-      <motion.div variants={item}>
-        <div className="flex flex-wrap gap-2">
-          {sections.map((sec) => (
-            <Button
-              key={sec.key}
-              variant={activeSection === sec.key ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setActiveSection(sec.key)}
-              className={activeSection !== sec.key ? 'border-border text-muted-foreground' : ''}
-            >
-              <sec.icon className="mr-1.5 h-4 w-4" />
-              {sec.label}
-            </Button>
-          ))}
-        </div>
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5"
+      >
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.title}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + i * 0.05 }}
+          >
+            <Card className="card-hover">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-xs font-medium">{stat.title}</CardTitle>
+                <div className={cn('p-1.5 rounded-md', stat.bg)}>
+                  <stat.icon className={cn('h-4 w-4', stat.color)} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold">{stat.value}</div>
+                <p className="text-[10px] text-emerald-500 mt-0.5">{stat.change} vs last period</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
       </motion.div>
 
-      {activeSection === 'incidents' && (
-        <motion.div variants={item}>
-          <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
-                <TrendingUp className="h-4 w-4 text-blue-400" />
-                Incident Trends (Last 30 Days)
+      <div className="grid gap-6 lg:grid-cols-2">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Activity className="h-4 w-4 text-blue-500" />
+                Daily Study Hours
               </CardTitle>
-              <CardDescription>Color-coded by severity level</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <LineChart data={incidentTrendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="day" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 10 }} interval={2} />
-                  <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <Tooltip {...chartTooltipStyle} />
-                  <Legend />
-                  <Line type="monotone" dataKey="low" stroke="#22c55e" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="medium" stroke="#eab308" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="high" stroke="#f97316" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="critical" stroke="#ef4444" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {activeSection === 'zones' && (
-        <motion.div variants={item}>
-          <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
-                <Activity className="h-4 w-4 text-red-400" />
-                High-Risk Zones
-              </CardTitle>
-              <CardDescription>Risk scores by factory zone</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={highRiskZones} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis type="number" domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <YAxis dataKey="zone" type="category" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} width={120} />
-                  <Tooltip {...chartTooltipStyle} />
-                  <Bar dataKey="risk" radius={[0, 4, 4, 0]}>
-                    {highRiskZones.map((entry, idx) => (
-                      <Cell key={idx} fill={entry.risk >= 70 ? '#ef4444' : entry.risk >= 50 ? '#f97316' : '#eab308'} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {activeSection === 'workers' && (
-        <motion.div variants={item}>
-          <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
-                <BarChart3 className="h-4 w-4 text-green-400" />
-                Worker Safety Scores
-              </CardTitle>
-              <CardDescription>Top and bottom performing workers</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={workerScores}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <YAxis domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <Tooltip {...chartTooltipStyle} />
-                  <Bar dataKey="score" radius={[4, 4, 0, 0]}>
-                    {workerScores.map((entry, idx) => (
-                      <Cell key={idx} fill={entry.score >= 80 ? '#22c55e' : entry.score >= 60 ? '#eab308' : '#ef4444'} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {activeSection === 'compliance' && (
-        <motion.div variants={item}>
-          <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
-                <PieChartIcon className="h-4 w-4 text-purple-400" />
-                Compliance Rate by Department
-              </CardTitle>
-              <CardDescription>Safety compliance distribution</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center md:flex-row md:items-start md:gap-8">
-                <ResponsiveContainer width={300} height={300}>
-                  <PieChart>
-                    <Pie
-                      data={complianceByDept}
-                      cx="50%" cy="50%" innerRadius={60} outerRadius={100}
-                      paddingAngle={3} dataKey="value"
-                    >
-                      {complianceByDept.map((_, idx) => (
-                        <Cell key={idx} fill={pieColors[idx % pieColors.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip {...chartTooltipStyle} />
-                  </PieChart>
+              <div className="h-[250px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={dailyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                      }}
+                    />
+                    <Line type="monotone" dataKey="hours" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                  </LineChart>
                 </ResponsiveContainer>
-                <div className="mt-4 space-y-2 md:mt-0">
-                  {complianceByDept.map((d, idx) => (
-                    <div key={d.name} className="flex items-center gap-3 text-sm">
-                      <div className="h-3 w-3 rounded-full" style={{ background: pieColors[idx] }} />
-                      <span className="text-white">{d.name}</span>
-                      <span className="text-muted-foreground">{d.value}%</span>
-                    </div>
-                  ))}
-                </div>
               </div>
             </CardContent>
           </Card>
         </motion.div>
-      )}
 
-      {activeSection === 'ai' && (
-        <motion.div variants={item}>
-          <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
-                <Cpu className="h-4 w-4 text-cyan-400" />
-                AI Accuracy Metrics
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-emerald-500" />
+                Subjects Comparison
               </CardTitle>
-              <CardDescription>Accuracy, precision, and recall over time</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <LineChart data={aiMetrics}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="day" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <YAxis domain={[80, 100]} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <Tooltip {...chartTooltipStyle} />
-                  <Legend />
-                  <Line type="monotone" dataKey="accuracy" stroke="#22c55e" strokeWidth={2} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="precision" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} />
-                  <Line type="monotone" dataKey="recall" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 4 }} />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="h-[250px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={subjectData} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis type="number" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis dataKey="subject" type="category" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" width={70} />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                      }}
+                    />
+                    <Bar dataKey="hours" radius={[0, 4, 4, 0]}>
+                      {subjectData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
-      )}
 
-      {activeSection === 'equipment' && (
-        <motion.div variants={item}>
-          <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
-                <Zap className="h-4 w-4 text-yellow-400" />
-                Equipment Health Scores
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-purple-500" />
+                Focus Time Trend
               </CardTitle>
-              <CardDescription>Health scores by device type</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={equipmentHealth}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <YAxis domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <Tooltip {...chartTooltipStyle} />
-                  <Bar dataKey="health" radius={[4, 4, 0, 0]}>
-                    {equipmentHealth.map((entry, idx) => (
-                      <Cell key={idx} fill={entry.health >= 80 ? '#22c55e' : entry.health >= 60 ? '#eab308' : '#ef4444'} />
+              <div className="h-[250px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={dailyData}>
+                    <defs>
+                      <linearGradient id="focusGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                      }}
+                    />
+                    <Area type="monotone" dataKey="focus" stroke="#8b5cf6" strokeWidth={2} fill="url(#focusGradient)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <PieChart className="h-4 w-4 text-amber-500" />
+                Time Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[250px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RePieChart>
+                    <Pie
+                      data={distributionData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {distributionData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        background: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                      }}
+                    />
+                    <Legend
+                      wrapperStyle={{ fontSize: '11px' }}
+                    />
+                  </RePieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="lg:col-span-2"
+        >
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
+                Activity Calendar
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-0.5 overflow-x-auto pb-2">
+                {Array.from({ length: 53 }).map((_, weekIdx) => (
+                  <div key={weekIdx} className="flex flex-col gap-0.5">
+                    {weekIdx === 0 && weekDays.map((d, i) => (
+                      <div key={i} className="h-2.5 text-[6px] text-muted-foreground leading-none">{d}</div>
                     ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                    {Array.from({ length: 7 }).map((_, dayIdx) => {
+                      const dataPoint = heatmapData.find(d => {
+                        const date = new Date(d.date);
+                        const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 86400000);
+                        const w = Math.floor(dayOfYear / 7);
+                        return w === weekIdx && date.getDay() === dayIdx;
+                      });
+                      const count = dataPoint?.count || 0;
+                      return (
+                        <div
+                          key={dayIdx}
+                          className={cn(
+                            'h-2.5 w-2.5 rounded-sm',
+                            count === 0 ? 'bg-muted/50' :
+                            count === 1 ? 'bg-primary/25' :
+                            count === 2 ? 'bg-primary/45' :
+                            count === 3 ? 'bg-primary/65' :
+                            'bg-primary/90'
+                          )}
+                          title={dataPoint ? `${dataPoint.date}: ${count} hours` : ''}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-end gap-1 mt-2">
+                <span className="text-[10px] text-muted-foreground">Less</span>
+                {[0, 1, 2, 3, 4].map(level => (
+                  <div key={level} className={cn(
+                    'h-2.5 w-2.5 rounded-sm',
+                    level === 0 ? 'bg-muted/50' :
+                    level === 1 ? 'bg-primary/25' :
+                    level === 2 ? 'bg-primary/45' :
+                    level === 3 ? 'bg-primary/65' :
+                    'bg-primary/90'
+                  )} />
+                ))}
+                <span className="text-[10px] text-muted-foreground">More</span>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
-      )}
 
-      {activeSection === 'productivity' && (
-        <motion.div variants={item}>
-          <Card className="border-border bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-white">
-                <Shield className="h-4 w-4 text-emerald-400" />
-                Productivity Metrics
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-4"
+        >
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Award className="h-4 w-4 text-orange-500" />
+                Streak Metrics
               </CardTitle>
-              <CardDescription>Output, efficiency, and safety trends</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <AreaChart data={productivityData}>
-                  <defs>
-                    <linearGradient id="outputGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="effGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="safeGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <YAxis domain={[70, 100]} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
-                  <Tooltip {...chartTooltipStyle} />
-                  <Legend />
-                  <Area type="monotone" dataKey="output" stroke="#22c55e" fill="url(#outputGrad)" strokeWidth={2} />
-                  <Area type="monotone" dataKey="efficiency" stroke="#3b82f6" fill="url(#effGrad)" strokeWidth={2} />
-                  <Area type="monotone" dataKey="safety" stroke="#8b5cf6" fill="url(#safeGrad)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
+            <CardContent className="space-y-3">
+              {streakMetrics.map((metric, i) => (
+                <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <metric.icon className={cn('h-4 w-4', metric.color)} />
+                    <span className="text-xs text-muted-foreground">{metric.label}</span>
+                  </div>
+                  <span className="text-sm font-semibold">{metric.value}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Brain className="h-4 w-4 text-primary" />
+                Productivity Score
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <div className="relative h-28 w-28 mx-auto mb-3">
+                <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="52" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
+                  <circle
+                    cx="60" cy="60" r="52"
+                    fill="none"
+                    stroke="#6366f1"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeDasharray={`${(productivityScore / 100) * 327} 327`}
+                    className="transition-all duration-1000"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-bold">{productivityScore}%</span>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">Based on consistency and focus time</p>
             </CardContent>
           </Card>
         </motion.div>
-      )}
-    </motion.div>
+      </div>
+    </div>
   );
 }

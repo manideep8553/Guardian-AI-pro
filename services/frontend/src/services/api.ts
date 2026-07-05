@@ -1,10 +1,20 @@
 import { config } from '../config';
-import type { ApiResponse, AuthResponse, Incident, DashboardSummary, LiveWorkerStatus, LiveAlert, EmergencyEvent } from '../types';
+import type {
+  ApiResponse,
+  AuthResponse,
+  User,
+  StudyRoom,
+  Task,
+  Resource,
+  StudyAnalytics,
+  LeaderboardEntry,
+  CodingSession,
+} from '../types';
 
 class ApiService {
   private baseUrl: string;
   private accessToken: string | null = null;
-  private refreshToken: string | null = null;
+  private _refreshToken: string | null = null;
   private isRefreshing = false;
   private failedQueue: Array<{
     resolve: (token: string) => void;
@@ -14,12 +24,12 @@ class ApiService {
   constructor() {
     this.baseUrl = config.apiUrl;
     this.accessToken = localStorage.getItem('accessToken');
-    this.refreshToken = localStorage.getItem('refreshToken');
+    this._refreshToken = localStorage.getItem('refreshToken');
   }
 
   setTokens(accessToken: string | null, refreshToken: string | null) {
     this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
+    this._refreshToken = refreshToken;
     if (accessToken) {
       localStorage.setItem('accessToken', accessToken);
     } else {
@@ -34,19 +44,19 @@ class ApiService {
 
   clearTokens() {
     this.accessToken = null;
-    this.refreshToken = null;
+    this._refreshToken = null;
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
   }
 
   private async refreshAccessToken(): Promise<string> {
-    if (!this.refreshToken) {
+    if (!this._refreshToken) {
       throw new Error('No refresh token');
     }
     const res = await fetch(`${this.baseUrl}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken: this.refreshToken }),
+      body: JSON.stringify({ refreshToken: this._refreshToken }),
     });
     const data: ApiResponse<{ accessToken: string; refreshToken: string }> = await res.json();
     if (!res.ok || !data.data) {
@@ -70,10 +80,10 @@ class ApiService {
 
     let response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
-      headers: { ...headers, ...options.headers },
+      headers: { ...headers, ...(options.headers as Record<string, string>) },
     });
 
-    if (response.status === 401 && this.refreshToken) {
+    if (response.status === 401 && this._refreshToken) {
       if (!this.isRefreshing) {
         this.isRefreshing = true;
         try {
@@ -83,7 +93,7 @@ class ApiService {
           headers.Authorization = `Bearer ${newToken}`;
           response = await fetch(`${this.baseUrl}${endpoint}`, {
             ...options,
-            headers: { ...headers, ...options.headers },
+            headers: { ...headers, ...(options.headers as Record<string, string>) },
           });
         } catch (err) {
           this.isRefreshing = false;
@@ -99,7 +109,7 @@ class ApiService {
         headers.Authorization = `Bearer ${newToken}`;
         response = await fetch(`${this.baseUrl}${endpoint}`, {
           ...options,
-          headers: { ...headers, ...options.headers },
+          headers: { ...headers, ...(options.headers as Record<string, string>) },
         });
       }
     }
@@ -124,17 +134,10 @@ class ApiService {
     this.failedQueue = [];
   }
 
-  async register(data: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    department: string;
-    employeeId: string;
-  }) {
-    const res = await this.request<AuthResponse>('/auth/register', {
+  async login(email: string, password: string) {
+    const res = await this.request<AuthResponse>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ email, password }),
     });
     if (res.data) {
       this.setTokens(res.data.accessToken, res.data.refreshToken);
@@ -142,10 +145,16 @@ class ApiService {
     return res;
   }
 
-  async login(email: string, password: string) {
-    const res = await this.request<AuthResponse>('/auth/login', {
+  async register(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    institution?: string;
+  }) {
+    const res = await this.request<AuthResponse>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify(data),
     });
     if (res.data) {
       this.setTokens(res.data.accessToken, res.data.refreshToken);
@@ -161,90 +170,114 @@ class ApiService {
     }
   }
 
+  async refreshToken() {
+    return this.request<{ accessToken: string; refreshToken: string }>('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken: this._refreshToken }),
+    });
+  }
+
   async getMe() {
-    return this.request<{ user: { userId: string; role: string } }>('/auth/me');
+    return this.request<{ user: User }>('/auth/me');
   }
 
-  async getIncidents(params?: Record<string, string>) {
+  async getStudyRooms(params?: Record<string, string>) {
     const query = params ? '?' + new URLSearchParams(params).toString() : '';
-    return this.request<{ incidents: Incident[]; meta: ApiResponse['meta'] }>(`/incidents${query}`);
+    return this.request<StudyRoom[]>(`/study-rooms${query}`);
   }
 
-  async forgotPassword(email: string) {
-    return this.request('/auth/forgot-password', {
-      method: 'POST',
-      body: JSON.stringify({ email }),
-    });
-  }
-
-  async verifyOtp(email: string, otp: string) {
-    return this.request('/auth/verify-otp', {
-      method: 'POST',
-      body: JSON.stringify({ email, otp }),
-    });
-  }
-
-  async resetPassword(email: string, otp: string, password: string) {
-    return this.request('/auth/reset-password', {
-      method: 'POST',
-      body: JSON.stringify({ email, otp, password }),
-    });
-  }
-
-  async getDashboardSummary() {
-    return this.request<DashboardSummary>('/monitor/dashboard');
-  }
-
-  async getWorkerStatuses() {
-    return this.request<LiveWorkerStatus[]>('/monitor/workers');
-  }
-
-  async getAlerts(limit = 50) {
-    return this.request<LiveAlert[]>(`/monitor/alerts?limit=${limit}`);
-  }
-
-  async getEmergencies(activeOnly = false) {
-    const query = activeOnly ? '?active=true' : '';
-    return this.request<EmergencyEvent[]>(`/monitor/emergencies${query}`);
-  }
-
-  async ingestSensorData(data: {
-    modality: string;
-    data: Record<string, unknown>;
-    confidence?: number;
-    workerId?: string;
-    factoryId?: string;
+  async createStudyRoom(data: {
+    name: string;
+    description: string;
+    subject: string;
+    isPrivate: boolean;
+    password?: string;
+    maxParticipants: number;
+    tags?: string[];
   }) {
-    return this.request('/monitor/ingest', {
+    return this.request<StudyRoom>('/study-rooms', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async triggerEmergency(data: {
-    type: string;
-    severity: string;
+  async getTasks(params?: Record<string, string>) {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return this.request<Task[]>(`/tasks${query}`);
+  }
+
+  async createTask(data: {
+    title: string;
+    description?: string;
+    priority: 'low' | 'medium' | 'high';
+    dueDate?: string;
+    category: string;
+    tags?: string[];
+  }) {
+    return this.request<Task>('/tasks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateTask(id: string, data: Partial<{
     title: string;
     description: string;
-    zone?: string;
-    affectedWorkerIds?: string[];
-    factoryId?: string;
+    priority: 'low' | 'medium' | 'high';
+    status: 'todo' | 'in_progress' | 'completed';
+    dueDate: string;
+    category: string;
+    tags: string[];
+  }>) {
+    return this.request<Task>(`/tasks/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getResources(params?: Record<string, string>) {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return this.request<Resource[]>(`/resources${query}`);
+  }
+
+  async getAnalytics() {
+    return this.request<StudyAnalytics>('/analytics');
+  }
+
+  async getLeaderboard() {
+    return this.request<LeaderboardEntry[]>('/leaderboard');
+  }
+
+  async getCodingSessions() {
+    return this.request<CodingSession[]>('/code/sessions');
+  }
+
+  async createCodingSession(data: {
+    language: string;
+    code: string;
+    input?: string;
   }) {
-    return this.request<EmergencyEvent>('/monitor/emergencies', {
+    return this.request<CodingSession>('/code/sessions', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async acknowledgeEmergency(id: string) {
-    return this.request<EmergencyEvent>(`/monitor/emergencies/${id}/acknowledge`, {
-      method: 'PATCH',
+  async executeCode(data: {
+    language: string;
+    code: string;
+    input?: string;
+  }) {
+    return this.request<{ output: string; duration: number }>('/code/execute', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   }
 
-  async resolveEmergency(id: string) {
-    return this.request<EmergencyEvent>(`/monitor/emergencies/${id}/resolve`, {
-      method: 'PATCH',
+  async chatWithAI(messages: { role: 'user' | 'assistant'; content: string }[]) {
+    return this.request<{ reply: string }>('/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify({ messages }),
     });
   }
 }

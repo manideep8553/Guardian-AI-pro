@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'supervisor' | 'safety_officer' | 'worker';
+export type UserRole = 'student' | 'admin';
 
 export interface User {
   _id: string;
@@ -6,9 +6,12 @@ export interface User {
   firstName: string;
   lastName: string;
   role: UserRole;
-  department: string;
-  employeeId: string;
-  isActive: boolean;
+  avatar?: string;
+  bio?: string;
+  institution?: string;
+  studyStreak: number;
+  totalStudyHours: number;
+  completedTasks: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -17,38 +20,6 @@ export interface AuthResponse {
   user: User;
   accessToken: string;
   refreshToken: string;
-}
-
-export type IncidentSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type IncidentStatus = 'reported' | 'investigating' | 'resolved' | 'closed';
-export type AlertType =
-  | 'hazard'
-  | 'near_miss'
-  | 'safety_violation'
-  | 'equipment_failure'
-  | 'environmental';
-
-export interface Incident {
-  _id: string;
-  title: string;
-  description: string;
-  type: AlertType;
-  severity: IncidentSeverity;
-  status: IncidentStatus;
-  location: {
-    type: string;
-    coordinates: [number, number];
-    address?: string;
-    zone?: string;
-  };
-  reportedBy: User | string;
-  assignedTo?: User | string;
-  witnesses?: string[];
-  mediaUrls?: string[];
-  rootCause?: string;
-  correctiveActions?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface ApiResponse<T = unknown> {
@@ -63,103 +34,90 @@ export interface ApiResponse<T = unknown> {
   };
 }
 
-export type RiskLevel = 'safe' | 'warning' | 'high_risk' | 'critical';
-export type RiskTrend = 'improving' | 'stable' | 'degrading' | 'critical';
-
-export interface ModalityScores {
-  vision?: number;
-  audio?: number;
-  wearable?: number;
-  environmental?: number;
-  location?: number;
-  machine_health?: number;
-}
-
-export interface FusionResult {
-  overallRiskScore: number;
-  riskLevel: RiskLevel;
-  modalityScores: ModalityScores;
-  temporalTrend: RiskTrend;
-  contributingFactors: string[];
-  timestamp: string;
-  anomalyDetected: boolean;
-}
-
-export interface LiveWorkerStatus {
-  workerId: string;
-  name: string;
-  employeeId: string;
-  department: string;
-  designation: string;
-  role: UserRole;
-  riskScore: number;
-  riskLevel: RiskLevel;
-  location?: { lat: number; lng: number; zone?: string; floor?: number };
-  vitals?: {
-    heartRate?: number;
-    spo2?: number;
-    temperature?: number;
-    stressLevel?: number;
-    fatigueIndex?: number;
-    fallDetected?: boolean;
-  };
-  lastPingAt: string;
-  isOnline: boolean;
-  inSafeZone: boolean;
-  currentZone?: string;
-  deviceStatus: string;
-}
-
-export interface LiveAlert {
-  id: string;
-  type: AlertType;
-  severity: IncidentSeverity | RiskLevel;
-  title: string;
-  message: string;
-  zone: string;
-  modality: string;
-  timestamp: string;
-  acknowledged: boolean;
-}
-
-export type EmergencyType =
-  | 'fire' | 'chemical_spill' | 'structural_failure' | 'worker_injury'
-  | 'gas_leak' | 'equipment_malfunction' | 'intrusion' | 'natural_disaster'
-  | 'power_outage' | 'medical_emergency';
-
-export type EmergencyStatus = 'active' | 'acknowledged' | 'evacuating' | 'contained' | 'resolved';
-
-export interface EmergencyEvent {
+export interface StudyRoom {
   _id: string;
-  type: EmergencyType;
-  severity: RiskLevel;
-  title: string;
+  name: string;
   description: string;
-  location?: { zone?: string; coordinates?: [number, number] };
-  affectedWorkers: string[];
-  requiresEvacuation: boolean;
-  evacuationRoute?: string;
-  status: EmergencyStatus;
-  acknowledgedBy?: { firstName: string; lastName: string } | string;
-  resolvedBy?: { firstName: string; lastName: string } | string;
-  incidentId?: string;
+  subject: string;
+  isPrivate: boolean;
+  password?: string;
+  maxParticipants: number;
+  participants: { user: User; joinedAt: string }[];
+  createdBy: User;
+  isActive: boolean;
+  tags: string[];
   createdAt: string;
 }
 
-export interface DashboardSummary {
-  fusion: {
-    overallRiskScore: number;
-    riskLevel: RiskLevel;
-    temporalTrend: RiskTrend;
-  };
-  workers: {
-    total: number;
-    online: number;
-    offline: number;
-    highRisk: number;
-    avgRiskScore: number;
-  };
-  alerts: LiveAlert[];
-  emergencies: number;
+export interface StudySession {
+  _id: string;
+  user: string;
+  room?: string;
+  startTime: string;
+  endTime?: string;
+  duration: number;
+  type: 'focus' | 'pomodoro' | 'group' | 'coding';
+  subject: string;
+  notes?: string;
+}
+
+export interface Task {
+  _id: string;
+  user: string;
+  title: string;
+  description?: string;
+  priority: 'low' | 'medium' | 'high';
+  status: 'todo' | 'in_progress' | 'completed';
+  dueDate?: string;
+  category: string;
+  tags: string[];
+  createdAt: string;
+}
+
+export interface Resource {
+  _id: string;
+  user: string;
+  title: string;
+  type: 'note' | 'pdf' | 'link' | 'code' | 'image';
+  url?: string;
+  content?: string;
+  subject: string;
+  tags: string[];
+  shared: boolean;
+  createdAt: string;
+}
+
+export interface StudyAnalytics {
+  daily: { date: string; hours: number; tasks: number; sessions: number }[];
+  weekly: { week: string; hours: number; focus: number; coding: number }[];
+  monthly: { month: string; hours: number; streak: number; completion: number }[];
+  subjects: { subject: string; hours: number; percentage: number }[];
+  pomodoro: { date: string; sessions: number; focusMinutes: number }[];
+  coding: { date: string; languages: Record<string, number> }[];
+}
+
+export interface LeaderboardEntry {
+  user: User;
+  totalHours: number;
+  streak: number;
+  tasksCompleted: number;
+  resourcesShared: number;
+  score: number;
+}
+
+export interface AIMessage {
+  role: 'user' | 'assistant';
+  content: string;
   timestamp: string;
+}
+
+export interface CodingSession {
+  _id: string;
+  language: string;
+  code: string;
+  input?: string;
+  output?: string;
+  status: 'running' | 'completed' | 'error';
+  duration: number;
+  createdAt: string;
 }

@@ -12,8 +12,7 @@ interface AuthContextType {
     password: string;
     firstName: string;
     lastName: string;
-    department: string;
-    employeeId: string;
+    institution?: string;
   }) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -33,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const res = await api.getMe();
       if (res.data?.user) {
-        setUser(res.data.user as unknown as User);
+        setUser(res.data.user);
       } else {
         api.clearTokens();
       }
@@ -62,8 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password: string;
       firstName: string;
       lastName: string;
-      department: string;
-      employeeId: string;
+      institution?: string;
     }) => {
       const res = await api.register(data);
       if (res.data?.user) {
