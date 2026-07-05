@@ -5,7 +5,6 @@ import compression from 'compression';
 import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
-import { logger } from './config/logger';
 import { swaggerSpec } from './config/swagger';
 import { generalLimiter } from './middleware/rateLimiter';
 import { errorHandler } from './middleware/errorHandler';

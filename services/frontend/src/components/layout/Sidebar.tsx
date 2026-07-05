@@ -4,13 +4,11 @@ import {
   Shield,
   AlertTriangle,
   LayoutDashboard,
-  Users,
   Settings,
   BarChart3,
   Factory,
   Cpu,
   HardHat,
-  Building2,
 } from 'lucide-react';
 
 const navItems = [

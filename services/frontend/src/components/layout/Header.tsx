@@ -10,7 +10,7 @@ export function Header() {
       <div>
         <h1 className="text-lg font-semibold">Welcome, {user?.firstName || 'User'}</h1>
         <p className="text-sm text-muted-foreground">
-          {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)} • {user?.department}
+          {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'N/A'} • {user?.department || 'N/A'}
         </p>
       </div>
 

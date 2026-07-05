@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       api.setAccessToken(token);
-      setUser({ userId: 'placeholder' } as User);
+      setUser({} as User);
     } catch {
       api.setAccessToken(null);
     } finally {
