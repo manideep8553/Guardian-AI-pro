@@ -1,8 +1,7 @@
 import numpy as np
 import logging
 from enum import Enum
-from typing import Optional, Any
-from app.core.config import settings
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

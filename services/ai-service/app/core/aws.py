@@ -1,8 +1,6 @@
 import json
-import asyncio
 import logging
 from datetime import datetime
-from typing import Optional
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -65,7 +63,7 @@ class AWSIoTCoreClient:
                     payload=json.dumps(item["payload"], default=str).encode(),
                 )
                 synced += 1
-            except:
+            except Exception:
                 remaining.append(item)
         self._pending_sync = remaining
         logger.info(f"AWS IoT sync: {synced} items synced, {len(remaining)} remaining")

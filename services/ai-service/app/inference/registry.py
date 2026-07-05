@@ -3,7 +3,7 @@ import json
 import logging
 from typing import Optional
 from app.core.config import settings
-from app.inference.engine import inference_engine, BackendType
+from app.inference.engine import inference_engine
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +104,6 @@ class ModelRegistry:
 
     async def _load_mediapipe_model(self, model_name: str, model_path: str) -> bool:
         try:
-            import mediapipe as mp
             if os.path.exists(model_path):
                 with open(model_path, "rb") as f:
                     model_data = f.read()

@@ -1,6 +1,5 @@
 import numpy as np
 import logging
-from typing import Optional
 from app.inference.engine import inference_engine
 
 logger = logging.getLogger(__name__)
@@ -85,7 +84,7 @@ class WhisperAnalyzer:
             mean_freq = float(np.mean(freqs))
             max_freq = float(freqs[np.argmax(np.mean(Sxx, axis=1))])
             return {"mean_freq": round(mean_freq, 2), "max_freq": round(max_freq, 2)}
-        except:
+        except Exception:
             return {"mean_freq": 0, "max_freq": 0}
 
 whisper_analyzer = WhisperAnalyzer()

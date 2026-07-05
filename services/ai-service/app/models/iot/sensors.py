@@ -1,9 +1,6 @@
-import numpy as np
 import logging
 import random
-import asyncio
 from datetime import datetime
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +43,22 @@ class EnvironmentalSensorSimulator:
 
     def _calculate_aqi(self, temp: float, humidity: float, gas: float, dust: float) -> dict:
         score = 0
-        if temp > 40: score += 40
-        elif temp > 35: score += 20
-        if humidity > 85: score += 20
-        elif humidity < 20: score += 15
-        if gas > 100: score += 30
-        elif gas > 50: score += 15
-        if dust > 150: score += 30
-        elif dust > 50: score += 15
+        if temp > 40:
+            score += 40
+        elif temp > 35:
+            score += 20
+        if humidity > 85:
+            score += 20
+        elif humidity < 20:
+            score += 15
+        if gas > 100:
+            score += 30
+        elif gas > 50:
+            score += 15
+        if dust > 150:
+            score += 30
+        elif dust > 50:
+            score += 15
         level = "hazardous" if score > 80 else "unhealthy" if score > 50 else "moderate" if score > 25 else "good"
         return {"score": min(score, 100), "level": level, "primary_pollutant": "dust" if dust > 50 else "gas" if gas > 50 else "none"}
 

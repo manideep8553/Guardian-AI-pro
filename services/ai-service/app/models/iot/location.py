@@ -1,8 +1,6 @@
 import random
 import logging
-import numpy as np
 from datetime import datetime
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 

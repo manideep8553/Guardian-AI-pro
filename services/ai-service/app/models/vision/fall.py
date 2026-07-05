@@ -1,7 +1,5 @@
 import numpy as np
 import logging
-from typing import Optional
-from app.inference.engine import inference_engine
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +16,6 @@ class FallDetector:
     async def detect(self, landmarks: list[dict], frame_shape: tuple) -> dict:
         if not landmarks or len(landmarks) < 17:
             return {"fall_detected": False, "confidence": 0.0, "risk_level": "none"}
-        nose = landmarks[0]
         left_hip = landmarks[11]
         right_hip = landmarks[12]
         left_ankle = landmarks[15]

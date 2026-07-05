@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Literal, Any
-from datetime import datetime
+from typing import Optional, Literal
 
 
 class HealthResponse(BaseModel):

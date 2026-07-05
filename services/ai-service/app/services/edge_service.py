@@ -2,7 +2,6 @@ import os
 import json
 import asyncio
 import logging
-import numpy as np
 from datetime import datetime
 from typing import Optional
 from app.core.config import settings

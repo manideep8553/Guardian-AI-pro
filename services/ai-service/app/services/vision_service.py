@@ -1,6 +1,5 @@
 import numpy as np
 import logging
-import asyncio
 from typing import Optional
 from app.models.vision.ppe import ppe_detector
 from app.models.vision.fall import fall_detector
@@ -8,7 +7,6 @@ from app.models.vision.posture import posture_detector
 from app.models.vision.fire import fire_detector
 from app.models.vision.intrusion import intrusion_detector
 from app.models.vision.counting import worker_counter
-from app.inference.engine import inference_engine
 
 logger = logging.getLogger(__name__)
 

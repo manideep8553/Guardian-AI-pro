@@ -1,6 +1,5 @@
 import numpy as np
 import logging
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +19,6 @@ class PostureDetector:
         if not landmarks or len(landmarks) < 17:
             return {"unsafe_posture": False, "risks": [], "overall_score": 1.0}
         nose = landmarks[0]
-        left_eye = landmarks[1]
-        right_eye = landmarks[2]
         left_shoulder = landmarks[5]
         right_shoulder = landmarks[6]
         left_hip = landmarks[11]

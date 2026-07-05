@@ -1,9 +1,8 @@
 import logging
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from app.models.schemas import (
     IoTDeviceReadRequest, IoTStreamRequest, IoTLocationRequest,
-    IoTAnomalyRequest, EquipmentReadRequest,
-    EdgeModeRequest, EdgeSyncResponse,
+    IoTAnomalyRequest, EdgeModeRequest,
 )
 from app.services.iot_service import iot_service
 from app.services.edge_service import edge_service

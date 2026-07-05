@@ -1,8 +1,6 @@
 import random
 import logging
-import numpy as np
 from datetime import datetime
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +27,6 @@ class WearableSimulator:
             base_spo2 -= random.randint(3, 8)
         hr = base_hr + random.randint(-5, 5)
         spo2 = min(base_spo2 + random.randint(-2, 1), 100)
-        hr_max = 220
-        hr_reserve = hr_max - hr
         hr_variability = random.randint(20, 80) if not self._stress_mode else random.randint(5, 20)
         stress_index = self._calculate_stress(hr, hr_variability, spo2)
         fatigue_index = self._calculate_fatigue(hr, hr_variability)

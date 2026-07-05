@@ -1,11 +1,9 @@
 import asyncio
-import json
 import logging
 from datetime import datetime
 from typing import Optional
 from app.core.mqtt import mqtt_client
 from app.core.aws import aws_iot_client
-from app.core.config import settings
 from app.models.iot.sensors import env_sensor_sim
 from app.models.iot.wearables import wearable_sim
 from app.models.iot.location import location_sim

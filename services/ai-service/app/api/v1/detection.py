@@ -2,7 +2,7 @@ import base64
 import numpy as np
 import logging
 from fastapi import APIRouter, HTTPException
-from app.models.schemas import VisionInferenceRequest, VisionAnalysisResponse, VisionAlert
+from app.models.schemas import VisionInferenceRequest, VisionAnalysisResponse
 from app.services.vision_service import vision_service
 from app.services.edge_service import edge_service
 

@@ -2,7 +2,7 @@ import base64
 import numpy as np
 import logging
 from fastapi import APIRouter, HTTPException
-from app.models.schemas import AudioInferenceRequest, AudioAnalysisResponse, AudioAlert
+from app.models.schemas import AudioInferenceRequest, AudioAnalysisResponse
 from app.services.audio_service import audio_service
 from app.services.edge_service import edge_service
 

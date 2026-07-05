@@ -1,4 +1,3 @@
-import numpy as np
 import logging
 from typing import Optional
 
@@ -44,7 +43,6 @@ class WorkerCounter:
         }
 
     def _match_track(self, bbox: list) -> Optional[str]:
-        import numpy as np
         best_match = None
         best_iou = 0
         for wid, info in self._tracked_workers.items():

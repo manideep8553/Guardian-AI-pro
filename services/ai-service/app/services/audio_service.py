@@ -1,6 +1,5 @@
 import numpy as np
 import logging
-from typing import Optional
 from app.models.audio.whisper import whisper_analyzer
 from app.models.audio.cnn import cnn_audio_classifier
 

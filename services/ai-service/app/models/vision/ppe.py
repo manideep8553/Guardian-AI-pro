@@ -1,7 +1,6 @@
 import numpy as np
 import logging
 from enum import Enum
-from typing import Optional
 from app.inference.engine import inference_engine
 
 logger = logging.getLogger(__name__)

@@ -1,6 +1,4 @@
-import numpy as np
 import logging
-from typing import Optional
 from shapely.geometry import Point, Polygon
 
 logger = logging.getLogger(__name__)
