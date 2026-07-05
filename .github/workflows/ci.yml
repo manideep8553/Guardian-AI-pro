@@ -14,36 +14,30 @@ jobs:
   lint-backend:
     name: Lint Backend
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: services/backend/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
+      - run: npx tsc --noEmit -p services/backend/tsconfig.json
+      - run: npx eslint services/backend/src --ext .ts --fix
 
   lint-frontend:
     name: Lint Frontend
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: services/frontend/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
+      - run: npx tsc --noEmit -p services/frontend/tsconfig.json
+      - run: npx eslint services/frontend/src --ext .ts,.tsx --fix
 
   lint-ai:
     name: Lint AI Service
@@ -63,33 +57,29 @@ jobs:
     name: Build Backend
     needs: [lint-backend]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
-      - run: npm run build
+      - run: npm run build -w services/backend
 
   build-frontend:
     name: Build Frontend
     needs: [lint-frontend]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
-      - run: npm run build
+      - run: npm run build -w services/frontend
 
   test-backend:
     name: Test Backend
@@ -104,17 +94,15 @@ jobs:
         image: redis:7-alpine
         ports:
           - 6379:6379
-    defaults:
-      run:
-        working-directory: services/backend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
-      - run: npm test
+      - run: npm test -w services/backend
         env:
           MONGODB_URI: mongodb://localhost:27017/guardianai-test
           REDIS_URL: redis://localhost:6379
