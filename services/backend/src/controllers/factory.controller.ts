@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import httpStatus from 'http-status';
 import { catchAsync } from '../utils/catchAsync';
-import { pick } from '../utils/pick';
+import { pick, parsePaginationQuery } from '../utils/pick';
 import * as factoryService from '../services/factory.service';
 import { IAuthRequest } from '../types';
 
@@ -22,7 +22,7 @@ export const createFactory = catchAsync(async (req: IAuthRequest, res: Response)
 export const getFactories = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['isActive']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await factoryService.getFactories({ ...filter, ...options });
+  const result = await factoryService.getFactories({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -78,7 +78,7 @@ export const getBuildings = catchAsync(async (req: IAuthRequest, res: Response) 
   const factoryId = req.query.factory as string | undefined;
   const filter = pick(req.query, ['isActive']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await factoryService.getBuildings({ ...filter, ...options }, factoryId);
+  const result = await factoryService.getBuildings({ ...filter, ...parsePaginationQuery(options) }, factoryId);
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -134,7 +134,7 @@ export const getFloors = catchAsync(async (req: IAuthRequest, res: Response) => 
   const buildingId = req.query.building as string | undefined;
   const filter = pick(req.query, ['isActive']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await factoryService.getFloors({ ...filter, ...options }, buildingId);
+  const result = await factoryService.getFloors({ ...filter, ...parsePaginationQuery(options) }, buildingId);
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -170,7 +170,7 @@ export const createZone = catchAsync(async (req: IAuthRequest, res: Response) =>
 export const getZones = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['type', 'floor', 'building', 'factory', 'isActive']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await factoryService.getZones({ ...filter, ...options });
+  const result = await factoryService.getZones({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -246,7 +246,7 @@ export const createDepartment = catchAsync(async (req: IAuthRequest, res: Respon
 export const getDepartments = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['factory', 'isActive']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await factoryService.getDepartments({ ...filter, ...options });
+  const result = await factoryService.getDepartments({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,

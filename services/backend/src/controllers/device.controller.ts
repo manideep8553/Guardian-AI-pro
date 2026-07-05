@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import httpStatus from 'http-status';
 import { catchAsync } from '../utils/catchAsync';
-import { pick } from '../utils/pick';
+import { pick, parsePaginationQuery } from '../utils/pick';
 import * as deviceService from '../services/device.service';
 import { IAuthRequest } from '../types';
 
@@ -22,7 +22,7 @@ export const registerDevice = catchAsync(async (req: IAuthRequest, res: Response
 export const getDevices = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['type', 'status', 'zone', 'assignedWorker']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await deviceService.getDevices({ ...filter, ...options });
+  const result = await deviceService.getDevices({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -130,7 +130,7 @@ export const uploadFirmware = catchAsync(async (req: IAuthRequest, res: Response
 export const getFirmwares = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['deviceType', 'isActive']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await deviceService.getFirmwares({ ...filter, ...options });
+  const result = await deviceService.getFirmwares({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,

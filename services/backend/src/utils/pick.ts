@@ -12,3 +12,15 @@ export function pick<T extends Record<string, unknown>, K extends keyof T>(
     {} as Pick<T, K>,
   );
 }
+
+export function parsePaginationQuery(query: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(query)) {
+    if (key === 'page' || key === 'limit') {
+      result[key] = Number(value);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}

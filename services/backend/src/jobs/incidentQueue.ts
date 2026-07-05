@@ -2,7 +2,7 @@ import { Queue, Worker, Job } from 'bullmq';
 import { getRedis } from '../config/redis';
 import { logger } from '../config/logger';
 
-const connection = getRedis();
+const connection = getRedis() as any;
 
 export const incidentQueue = new Queue('incident-processing', {
   connection,
@@ -15,7 +15,7 @@ export const incidentQueue = new Queue('incident-processing', {
 });
 
 export const notificationQueue = new Queue('notifications', {
-  connection,
+  connection: connection,
   defaultJobOptions: {
     attempts: 3,
     backoff: { type: 'fixed', delay: 1000 },
@@ -39,7 +39,7 @@ export const incidentWorker = new Worker(
         logger.warn(`Unknown job type: ${job.name}`);
     }
   },
-  { connection },
+  { connection: connection },
 );
 
 async function analyzeRisk(data: Record<string, unknown>): Promise<void> {

@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import httpStatus from 'http-status';
 import { catchAsync } from '../utils/catchAsync';
-import { pick } from '../utils/pick';
+import { pick, parsePaginationQuery } from '../utils/pick';
 import * as workerService from '../services/worker.service';
 import { IAuthRequest } from '../types';
 
@@ -22,7 +22,7 @@ export const createWorker = catchAsync(async (req: IAuthRequest, res: Response) 
 export const getWorkers = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['department', 'gender', 'isActive', 'designation', 'shiftId']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await workerService.getWorkers({ ...filter, ...options });
+  const result = await workerService.getWorkers({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -88,7 +88,7 @@ export const createShift = catchAsync(async (req: IAuthRequest, res: Response) =
 export const getShifts = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['type', 'department', 'zone', 'isActive']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await workerService.getShifts({ ...filter, ...options });
+  const result = await workerService.getShifts({ ...filter, ...parsePaginationQuery(options) });
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -120,7 +120,7 @@ export const markAttendance = catchAsync(async (req: IAuthRequest, res: Response
 export const getAttendance = catchAsync(async (req: IAuthRequest, res: Response) => {
   const filter = pick(req.query, ['worker', 'status', 'startDate', 'endDate']);
   const options = pick(req.query, ['page', 'limit', 'sort', 'order']);
-  const result = await workerService.getAttendance({ ...filter, ...options });
+  const result = await workerService.getAttendance({ ...filter, ...parsePaginationQuery(options) } as any);
 
   res.status(httpStatus.OK).json({
     success: true,
