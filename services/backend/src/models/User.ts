@@ -17,6 +17,8 @@ export interface IUser extends Document {
   emailVerificationExpires?: Date;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
+  otp?: string;
+  otpExpires?: Date;
   lastLogin?: Date;
   refreshToken?: string;
   phone?: string;
@@ -28,66 +30,23 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>(
   {
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-      index: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      minlength: 8,
-      select: false,
-    },
-    firstName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    role: {
-      type: String,
-      enum: Object.values(UserRole),
-      default: UserRole.WORKER,
-      required: true,
-    },
-    department: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    employeeId: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
+    password: { type: String, required: true, minlength: 8, select: false },
+    firstName: { type: String, required: true, trim: true },
+    lastName: { type: String, required: true, trim: true },
+    role: { type: String, enum: Object.values(UserRole), default: UserRole.WORKER, required: true },
+    department: { type: String, required: true, trim: true },
+    employeeId: { type: String, required: true, unique: true, trim: true },
+    isActive: { type: Boolean, default: true },
+    isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: String,
     emailVerificationExpires: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
-    lastLogin: {
-      type: Date,
-    },
-    refreshToken: {
-      type: String,
-      select: false,
-    },
+    otp: String,
+    otpExpires: Date,
+    lastLogin: Date,
+    refreshToken: { type: String, select: false },
     phone: String,
     profileImage: String,
   },
@@ -97,6 +56,8 @@ const userSchema = new Schema<IUser>(
       transform(_doc, ret) {
         delete ret.password;
         delete ret.refreshToken;
+        delete ret.otp;
+        delete ret.otpExpires;
         delete ret.__v;
         return ret;
       },

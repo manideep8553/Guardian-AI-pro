@@ -4,19 +4,56 @@ import type { ApiResponse, AuthResponse, Incident } from '../types';
 class ApiService {
   private baseUrl: string;
   private accessToken: string | null = null;
+  private refreshToken: string | null = null;
+  private isRefreshing = false;
+  private failedQueue: Array<{
+    resolve: (token: string) => void;
+    reject: (error: unknown) => void;
+  }> = [];
 
   constructor() {
     this.baseUrl = config.apiUrl;
     this.accessToken = localStorage.getItem('accessToken');
+    this.refreshToken = localStorage.getItem('refreshToken');
   }
 
-  setAccessToken(token: string | null) {
-    this.accessToken = token;
-    if (token) {
-      localStorage.setItem('accessToken', token);
+  setTokens(accessToken: string | null, refreshToken: string | null) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    if (accessToken) {
+      localStorage.setItem('accessToken', accessToken);
     } else {
       localStorage.removeItem('accessToken');
     }
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
+    } else {
+      localStorage.removeItem('refreshToken');
+    }
+  }
+
+  clearTokens() {
+    this.accessToken = null;
+    this.refreshToken = null;
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  }
+
+  private async refreshAccessToken(): Promise<string> {
+    if (!this.refreshToken) {
+      throw new Error('No refresh token');
+    }
+    const res = await fetch(`${this.baseUrl}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: this.refreshToken }),
+    });
+    const data: ApiResponse<{ accessToken: string; refreshToken: string }> = await res.json();
+    if (!res.ok || !data.data) {
+      throw new Error(data.message || 'Failed to refresh token');
+    }
+    this.setTokens(data.data.accessToken, data.data.refreshToken);
+    return data.data.accessToken;
   }
 
   private async request<T>(
@@ -31,10 +68,41 @@ class ApiService {
       headers.Authorization = `Bearer ${this.accessToken}`;
     }
 
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    let response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
       headers: { ...headers, ...options.headers },
     });
+
+    if (response.status === 401 && this.refreshToken) {
+      if (!this.isRefreshing) {
+        this.isRefreshing = true;
+        try {
+          const newToken = await this.refreshAccessToken();
+          this.isRefreshing = false;
+          this.processQueue(null, newToken);
+          headers.Authorization = `Bearer ${newToken}`;
+          response = await fetch(`${this.baseUrl}${endpoint}`, {
+            ...options,
+            headers: { ...headers, ...options.headers },
+          });
+        } catch (err) {
+          this.isRefreshing = false;
+          this.processQueue(err, null);
+          this.clearTokens();
+          window.location.href = '/login';
+          throw err;
+        }
+      } else {
+        const newToken = await new Promise<string>((resolve, reject) => {
+          this.failedQueue.push({ resolve, reject });
+        });
+        headers.Authorization = `Bearer ${newToken}`;
+        response = await fetch(`${this.baseUrl}${endpoint}`, {
+          ...options,
+          headers: { ...headers, ...options.headers },
+        });
+      }
+    }
 
     const data: ApiResponse<T> = await response.json();
 
@@ -45,38 +113,34 @@ class ApiService {
     return data;
   }
 
+  private processQueue(error: unknown, token: string | null) {
+    this.failedQueue.forEach((promise) => {
+      if (error) {
+        promise.reject(error);
+      } else {
+        promise.resolve(token!);
+      }
+    });
+    this.failedQueue = [];
+  }
+
   async login(email: string, password: string) {
     const res = await this.request<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
     if (res.data) {
-      this.setAccessToken(res.data.accessToken);
-    }
-    return res;
-  }
-
-  async register(data: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    department: string;
-    employeeId: string;
-  }) {
-    const res = await this.request<AuthResponse>('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    if (res.data) {
-      this.setAccessToken(res.data.accessToken);
+      this.setTokens(res.data.accessToken, res.data.refreshToken);
     }
     return res;
   }
 
   async logout() {
-    await this.request('/auth/logout', { method: 'POST' });
-    this.setAccessToken(null);
+    try {
+      await this.request('/auth/logout', { method: 'POST' });
+    } finally {
+      this.clearTokens();
+    }
   }
 
   async getMe() {
@@ -85,31 +149,28 @@ class ApiService {
 
   async getIncidents(params?: Record<string, string>) {
     const query = params ? '?' + new URLSearchParams(params).toString() : '';
-    return this.request<{ incidents: Incident[]; meta: ApiResponse['meta'] }>(
-      `/incidents${query}`,
-    );
+    return this.request<{ incidents: Incident[]; meta: ApiResponse['meta'] }>(`/incidents${query}`);
   }
 
-  async getIncident(id: string) {
-    return this.request<Incident>(`/incidents/${id}`);
-  }
-
-  async createIncident(data: Partial<Incident>) {
-    return this.request<Incident>('/incidents', {
+  async forgotPassword(email: string) {
+    return this.request('/auth/forgot-password', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ email }),
     });
   }
 
-  async updateIncident(id: string, data: Partial<Incident>) {
-    return this.request<Incident>(`/incidents/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(data),
+  async verifyOtp(email: string, otp: string) {
+    return this.request('/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
     });
   }
 
-  async deleteIncident(id: string) {
-    return this.request(`/incidents/${id}`, { method: 'DELETE' });
+  async resetPassword(email: string, otp: string, password: string) {
+    return this.request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp, password }),
+    });
   }
 }
 
