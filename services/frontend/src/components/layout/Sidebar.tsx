@@ -10,16 +10,29 @@ import {
   Cpu,
   HardHat,
   Radio,
+  Map,
+  ShieldCheck,
+  Wrench,
+  FileText,
+  UserCog,
 } from 'lucide-react';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/live', icon: Radio, label: 'Live Monitoring' },
+  { to: '/admin', icon: UserCog, label: 'Admin' },
+  { to: '/supervisor', icon: HardHat, label: 'Supervisor' },
+  { to: '/safety-officer', icon: ShieldCheck, label: 'Safety Officer' },
+  { to: '/worker', icon: LayoutDashboard, label: 'Worker' },
   { to: '/incidents', icon: AlertTriangle, label: 'Incidents' },
   { to: '/workers', icon: HardHat, label: 'Workers' },
   { to: '/factories', icon: Factory, label: 'Factories' },
   { to: '/devices', icon: Cpu, label: 'Devices' },
+  { to: '/map', icon: Map, label: 'Factory Map' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { to: '/compliance', icon: ShieldCheck, label: 'Compliance' },
+  { to: '/maintenance', icon: Wrench, label: 'Maintenance' },
+  { to: '/reports', icon: FileText, label: 'Reports' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 

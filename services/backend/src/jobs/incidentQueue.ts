@@ -2,7 +2,7 @@ import { Queue, Worker, Job } from 'bullmq';
 import { getRedis } from '../config/redis';
 import { logger } from '../config/logger';
 
-const connection = getRedis();
+const connection = getRedis() as any;
 
 export const incidentQueue = new Queue('incident-processing', {
   connection,
