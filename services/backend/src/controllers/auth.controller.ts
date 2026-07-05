@@ -4,6 +4,18 @@ import { catchAsync } from '../utils/catchAsync';
 import * as authService from '../services/auth.service';
 import { IAuthRequest } from '../types';
 
+export const register = catchAsync(async (req: Request, res: Response) => {
+  const { email, password, firstName, lastName, department, employeeId } = req.body;
+  const { user, accessToken, refreshToken } = await authService.registerUser(
+    email, password, firstName, lastName, department, employeeId,
+  );
+  res.status(httpStatus.CREATED).json({
+    success: true,
+    message: 'User registered successfully',
+    data: { user, accessToken, refreshToken },
+  });
+});
+
 export const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const { user, accessToken, refreshToken } = await authService.loginUser(email, password);

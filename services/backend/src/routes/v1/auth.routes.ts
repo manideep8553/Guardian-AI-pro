@@ -3,6 +3,7 @@ import { authenticate } from '../../middleware/auth';
 import { validate } from '../../middleware/validate';
 import { authLimiter } from '../../middleware/rateLimiter';
 import {
+  registerSchema,
   loginSchema,
   refreshTokenSchema,
   forgotPasswordSchema,
@@ -48,6 +49,7 @@ const router = Router();
  *       401:
  *         description: Invalid credentials
  */
+router.post('/register', authLimiter, validate(registerSchema), authController.register);
 router.post('/login', authLimiter, validate(loginSchema), authController.login);
 
 /**

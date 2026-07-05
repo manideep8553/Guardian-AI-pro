@@ -120,7 +120,13 @@ export function LoginPage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="justify-center border-t border-slate-800 pt-6">
+        <CardFooter className="flex-col gap-2 border-t border-slate-800 pt-6">
+          <p className="text-sm text-slate-400">
+            Don&apos;t have an account?{' '}
+            <Link to="/register" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
+              Create one
+            </Link>
+          </p>
           <p className="text-xs text-slate-500">
             Powered by GuardianAI Pro &copy; {new Date().getFullYear()}
           </p>

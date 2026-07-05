@@ -124,6 +124,24 @@ class ApiService {
     this.failedQueue = [];
   }
 
+  async register(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    department: string;
+    employeeId: string;
+  }) {
+    const res = await this.request<AuthResponse>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (res.data) {
+      this.setTokens(res.data.accessToken, res.data.refreshToken);
+    }
+    return res;
+  }
+
   async login(email: string, password: string) {
     const res = await this.request<AuthResponse>('/auth/login', {
       method: 'POST',

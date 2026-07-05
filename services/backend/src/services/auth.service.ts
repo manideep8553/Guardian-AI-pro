@@ -5,6 +5,26 @@ import { ApiError } from '../utils/ApiError';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from './token.service';
 import { IAuthPayload } from '../types';
 
+export async function registerUser(
+  email: string, password: string, firstName: string, lastName: string,
+  department: string, employeeId: string,
+) {
+  const existingUser = await User.findOne({ $or: [{ email }, { employeeId }] });
+  if (existingUser) {
+    throw new ApiError(httpStatus.CONFLICT, 'Email or Employee ID already exists');
+  }
+  const user = await User.create({
+    email, password, firstName, lastName, department, employeeId,
+    role: 'worker',
+  });
+  const payload: IAuthPayload = { userId: user._id.toString(), role: user.role };
+  const accessToken = generateAccessToken(payload);
+  const refreshToken = generateRefreshToken(payload);
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+  return { user, accessToken, refreshToken };
+}
+
 export async function loginUser(email: string, password: string) {
   const user = await User.findOne({ email }).select('+password +refreshToken');
   if (!user || !(await user.comparePassword(password))) {
