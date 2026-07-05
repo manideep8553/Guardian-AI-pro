@@ -154,3 +154,144 @@ export interface IGeoLocation {
   type: 'Point';
   coordinates: [number, number];
 }
+
+export enum RiskLevel {
+  SAFE = 'safe',
+  WARNING = 'warning',
+  HIGH_RISK = 'high_risk',
+  CRITICAL = 'critical',
+}
+
+export enum ModalityType {
+  VISION = 'vision',
+  AUDIO = 'audio',
+  WEARABLE = 'wearable',
+  ENVIRONMENTAL = 'environmental',
+  LOCATION = 'location',
+  MACHINE_HEALTH = 'machine_health',
+}
+
+export interface IModalityInput {
+  type: ModalityType;
+  timestamp: Date;
+  data: Record<string, unknown>;
+  confidence?: number;
+}
+
+export interface IFusionResult {
+  overallRiskScore: number;
+  riskLevel: RiskLevel;
+  modalityScores: Record<ModalityType, number>;
+  temporalTrend: 'improving' | 'stable' | 'degrading' | 'critical';
+  contributingFactors: string[];
+  timestamp: Date;
+  anomalyDetected: boolean;
+}
+
+export interface IWorkerVitals {
+  heartRate?: number;
+  bloodPressureSystolic?: number;
+  bloodPressureDiastolic?: number;
+  spo2?: number;
+  temperature?: number;
+  respiratoryRate?: number;
+  stressLevel?: number;
+  fatigueIndex?: number;
+  stepCount?: number;
+  fallDetected?: boolean;
+  impactDetected?: boolean;
+}
+
+export interface IEnvironmentalReading {
+  temperature?: number;
+  humidity?: number;
+  airQualityIndex?: number;
+  gasLevel?: Record<string, number>;
+  noiseLevel?: number;
+  luminance?: number;
+  vibration?: number;
+  radiation?: number;
+}
+
+export interface IMachineHealthReading {
+  temperature?: number;
+  vibration?: number;
+  rpm?: number;
+  powerConsumption?: number;
+  pressure?: number;
+  errorCode?: string;
+  maintenanceDue?: boolean;
+  anomalyScore?: number;
+}
+
+export enum EmergencyType {
+  FIRE = 'fire',
+  CHEMICAL_SPILL = 'chemical_spill',
+  STRUCTURAL_FAILURE = 'structural_failure',
+  WORKER_INJURY = 'worker_injury',
+  GAS_LEAK = 'gas_leak',
+  EQUIPMENT_MALFUNCTION = 'equipment_malfunction',
+  INTRUSION = 'intrusion',
+  NATURAL_DISASTER = 'natural_disaster',
+  POWER_OUTAGE = 'power_outage',
+  MEDICAL_EMERGENCY = 'medical_emergency',
+}
+
+export enum EmergencyAction {
+  SOUND_SIREN = 'sound_siren',
+  SEND_PUSH = 'send_push',
+  SEND_SMS = 'send_sms',
+  SEND_EMAIL = 'send_email',
+  NOTIFY_SUPERVISOR = 'notify_supervisor',
+  TRIGGER_EVACUATION = 'trigger_evacuation',
+  LOG_INCIDENT = 'log_incident',
+  CALL_EMERGENCY_SERVICES = 'call_emergency_services',
+  ACTIVATE_SPRINKLERS = 'activate_sprinklers',
+  SHUTDOWN_EQUIPMENT = 'shutdown_equipment',
+}
+
+export enum EmergencyStatus {
+  ACTIVE = 'active',
+  ACKNOWLEDGED = 'acknowledged',
+  EVACUATING = 'evacuating',
+  CONTAINED = 'contained',
+  RESOLVED = 'resolved',
+}
+
+export interface ILiveWorkerStatus {
+  workerId: string;
+  name: string;
+  employeeId: string;
+  department: string;
+  designation: string;
+  role: UserRole;
+  riskScore: number;
+  riskLevel: RiskLevel;
+  location?: { lat: number; lng: number; zone?: string; floor?: number };
+  vitals?: IWorkerVitals;
+  lastPingAt: Date;
+  isOnline: boolean;
+  inSafeZone: boolean;
+  currentZone?: string;
+  deviceStatus: string;
+}
+
+export interface ILiveAlert {
+  id: string;
+  type: AlertType;
+  severity: IncidentSeverity | RiskLevel;
+  title: string;
+  message: string;
+  zone: string;
+  modality: ModalityType;
+  timestamp: Date;
+  acknowledged: boolean;
+  acknowledgedBy?: string;
+}
+
+export enum RiskTrend {
+  IMPROVING = 'improving',
+  STABLE = 'stable',
+  DEGRADING = 'degrading',
+  CRITICAL = 'critical',
+}

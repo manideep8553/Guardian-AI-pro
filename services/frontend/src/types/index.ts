@@ -62,3 +62,104 @@ export interface ApiResponse<T = unknown> {
     totalPages: number;
   };
 }
+
+export type RiskLevel = 'safe' | 'warning' | 'high_risk' | 'critical';
+export type RiskTrend = 'improving' | 'stable' | 'degrading' | 'critical';
+
+export interface ModalityScores {
+  vision?: number;
+  audio?: number;
+  wearable?: number;
+  environmental?: number;
+  location?: number;
+  machine_health?: number;
+}
+
+export interface FusionResult {
+  overallRiskScore: number;
+  riskLevel: RiskLevel;
+  modalityScores: ModalityScores;
+  temporalTrend: RiskTrend;
+  contributingFactors: string[];
+  timestamp: string;
+  anomalyDetected: boolean;
+}
+
+export interface LiveWorkerStatus {
+  workerId: string;
+  name: string;
+  employeeId: string;
+  department: string;
+  designation: string;
+  role: UserRole;
+  riskScore: number;
+  riskLevel: RiskLevel;
+  location?: { lat: number; lng: number; zone?: string; floor?: number };
+  vitals?: {
+    heartRate?: number;
+    spo2?: number;
+    temperature?: number;
+    stressLevel?: number;
+    fatigueIndex?: number;
+    fallDetected?: boolean;
+  };
+  lastPingAt: string;
+  isOnline: boolean;
+  inSafeZone: boolean;
+  currentZone?: string;
+  deviceStatus: string;
+}
+
+export interface LiveAlert {
+  id: string;
+  type: AlertType;
+  severity: IncidentSeverity | RiskLevel;
+  title: string;
+  message: string;
+  zone: string;
+  modality: string;
+  timestamp: string;
+  acknowledged: boolean;
+}
+
+export type EmergencyType =
+  | 'fire' | 'chemical_spill' | 'structural_failure' | 'worker_injury'
+  | 'gas_leak' | 'equipment_malfunction' | 'intrusion' | 'natural_disaster'
+  | 'power_outage' | 'medical_emergency';
+
+export type EmergencyStatus = 'active' | 'acknowledged' | 'evacuating' | 'contained' | 'resolved';
+
+export interface EmergencyEvent {
+  _id: string;
+  type: EmergencyType;
+  severity: RiskLevel;
+  title: string;
+  description: string;
+  location?: { zone?: string; coordinates?: [number, number] };
+  affectedWorkers: string[];
+  requiresEvacuation: boolean;
+  evacuationRoute?: string;
+  status: EmergencyStatus;
+  acknowledgedBy?: { firstName: string; lastName: string } | string;
+  resolvedBy?: { firstName: string; lastName: string } | string;
+  incidentId?: string;
+  createdAt: string;
+}
+
+export interface DashboardSummary {
+  fusion: {
+    overallRiskScore: number;
+    riskLevel: RiskLevel;
+    temporalTrend: RiskTrend;
+  };
+  workers: {
+    total: number;
+    online: number;
+    offline: number;
+    highRisk: number;
+    avgRiskScore: number;
+  };
+  alerts: LiveAlert[];
+  emergencies: number;
+  timestamp: string;
+}

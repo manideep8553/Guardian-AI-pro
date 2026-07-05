@@ -13,6 +13,7 @@ import incidentRoutes from './routes/v1/incident.routes';
 import workerRoutes from './routes/v1/worker.routes';
 import factoryRoutes from './routes/v1/factory.routes';
 import deviceRoutes from './routes/v1/device.routes';
+import monitorRoutes from './routes/v1/monitor.routes';
 import { ApiError } from './utils/ApiError';
 
 const app = express();
@@ -37,6 +38,7 @@ app.use(`${config.apiPrefix}/incidents`, incidentRoutes);
 app.use(`${config.apiPrefix}/workers`, workerRoutes);
 app.use(`${config.apiPrefix}/factories`, factoryRoutes);
 app.use(`${config.apiPrefix}/devices`, deviceRoutes);
+app.use(`${config.apiPrefix}/monitor`, monitorRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   explorer: true,

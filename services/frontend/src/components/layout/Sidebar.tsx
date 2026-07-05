@@ -9,10 +9,12 @@ import {
   Factory,
   Cpu,
   HardHat,
+  Radio,
 } from 'lucide-react';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/live', icon: Radio, label: 'Live Monitoring' },
   { to: '/incidents', icon: AlertTriangle, label: 'Incidents' },
   { to: '/workers', icon: HardHat, label: 'Workers' },
   { to: '/factories', icon: Factory, label: 'Factories' },

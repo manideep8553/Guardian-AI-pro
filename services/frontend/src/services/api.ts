@@ -1,5 +1,5 @@
 import { config } from '../config';
-import type { ApiResponse, AuthResponse, Incident } from '../types';
+import type { ApiResponse, AuthResponse, Incident, DashboardSummary, LiveWorkerStatus, LiveAlert, EmergencyEvent } from '../types';
 
 class ApiService {
   private baseUrl: string;
@@ -188,6 +188,63 @@ class ApiService {
     return this.request('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ email, otp, password }),
+    });
+  }
+
+  async getDashboardSummary() {
+    return this.request<DashboardSummary>('/monitor/dashboard');
+  }
+
+  async getWorkerStatuses() {
+    return this.request<LiveWorkerStatus[]>('/monitor/workers');
+  }
+
+  async getAlerts(limit = 50) {
+    return this.request<LiveAlert[]>(`/monitor/alerts?limit=${limit}`);
+  }
+
+  async getEmergencies(activeOnly = false) {
+    const query = activeOnly ? '?active=true' : '';
+    return this.request<EmergencyEvent[]>(`/monitor/emergencies${query}`);
+  }
+
+  async ingestSensorData(data: {
+    modality: string;
+    data: Record<string, unknown>;
+    confidence?: number;
+    workerId?: string;
+    factoryId?: string;
+  }) {
+    return this.request('/monitor/ingest', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async triggerEmergency(data: {
+    type: string;
+    severity: string;
+    title: string;
+    description: string;
+    zone?: string;
+    affectedWorkerIds?: string[];
+    factoryId?: string;
+  }) {
+    return this.request<EmergencyEvent>('/monitor/emergencies', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async acknowledgeEmergency(id: string) {
+    return this.request<EmergencyEvent>(`/monitor/emergencies/${id}/acknowledge`, {
+      method: 'PATCH',
+    });
+  }
+
+  async resolveEmergency(id: string) {
+    return this.request<EmergencyEvent>(`/monitor/emergencies/${id}/resolve`, {
+      method: 'PATCH',
     });
   }
 }

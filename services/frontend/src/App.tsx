@@ -4,6 +4,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { LiveDashboardPage } from './pages/LiveDashboardPage';
 import { IncidentsPage } from './pages/IncidentsPage';
 import { WorkersPage } from './pages/WorkersPage';
 import { FactoriesPage } from './pages/FactoriesPage';
@@ -69,6 +70,7 @@ export default function App() {
         }
       >
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/live" element={<LiveDashboardPage />} />
         <Route path="/incidents" element={<IncidentsPage />} />
         <Route path="/workers" element={<WorkersPage />} />
         <Route path="/factories" element={<FactoriesPage />} />

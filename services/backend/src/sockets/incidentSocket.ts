@@ -42,6 +42,7 @@ export function initializeSocket(httpServer: HttpServer): Server {
     if (user.role === 'admin' || user.role === 'supervisor') {
       socket.join('supervisors');
     }
+    socket.join('monitor:live');
 
     socket.on('join:incident', (incidentId: string) => {
       socket.join(`incident:${incidentId}`);
@@ -49,6 +50,29 @@ export function initializeSocket(httpServer: HttpServer): Server {
 
     socket.on('leave:incident', (incidentId: string) => {
       socket.leave(`incident:${incidentId}`);
+    });
+
+    socket.on('monitor:subscribe', (rooms: string[]) => {
+      rooms.forEach((room) => {
+        if (['worker-updates', 'fusion-events', 'emergency-events', 'sensor-stream'].includes(room)) {
+          socket.join(`monitor:${room}`);
+        }
+      });
+    });
+
+    socket.on('monitor:unsubscribe', (rooms: string[]) => {
+      rooms.forEach((room) => {
+        socket.leave(`monitor:${room}`);
+      });
+    });
+
+    socket.on('sensor:ingest', (data: unknown) => {
+      if (user.role === 'admin' || user.role === 'supervisor') {
+        io.to('monitor:sensor-stream').emit('sensor:reading', {
+          ...(data as object),
+          receivedAt: new Date(),
+        });
+      }
     });
 
     socket.on('disconnect', () => {
@@ -70,4 +94,24 @@ export function getIO(): Server {
 export function emitIncidentUpdate(incidentId: string, event: string, data: unknown): void {
   io.to(`incident:${incidentId}`).emit(event, data);
   io.to('supervisors').emit(event, data);
+}
+
+export function emitWorkerStatusUpdate(data: unknown): void {
+  io.to('monitor:worker-updates').emit('worker:status-update', data);
+  io.to('supervisors').emit('worker:status-update', data);
+}
+
+export function emitFusionUpdate(data: unknown): void {
+  io.to('monitor:fusion-events').emit('fusion:update', data);
+  io.to('supervisors').emit('fusion:update', data);
+}
+
+export function emitSensorReading(data: unknown): void {
+  io.to('monitor:sensor-stream').emit('sensor:reading', data);
+}
+
+export function emitEmergencyEvent(data: unknown): void {
+  io.to('monitor:emergency-events').emit('emergency:new', data);
+  io.to('supervisors').emit('emergency:new', data);
+  io.emit('emergency:alert', data);
 }
