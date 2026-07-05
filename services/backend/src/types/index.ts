@@ -295,3 +295,111 @@ export enum RiskTrend {
   DEGRADING = 'degrading',
   CRITICAL = 'critical',
 }
+
+export enum SensorType {
+  TEMPERATURE = 'temperature',
+  HUMIDITY = 'humidity',
+  GAS = 'gas',
+  MOTION = 'motion',
+  VIBRATION = 'vibration',
+  SOUND = 'sound',
+  LIGHT = 'light',
+  RADIATION = 'radiation',
+  PRESSURE = 'pressure',
+  FLOW = 'flow',
+  LEVEL = 'level',
+  PROXIMITY = 'proximity',
+  SMOKE = 'smoke',
+  FLAME = 'flame',
+  CURRENT = 'current',
+  VOLTAGE = 'voltage',
+  POWER = 'power',
+}
+
+export enum SensorStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  ERROR = 'error',
+  CALIBRATING = 'calibrating',
+}
+
+export enum NotificationType {
+  PUSH = 'push',
+  SMS = 'sms',
+  EMAIL = 'email',
+  IN_APP = 'in_app',
+}
+
+export enum NotificationPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+export enum ReportType {
+  COMPLIANCE = 'compliance',
+  INCIDENT = 'incident',
+  AUDIT = 'audit',
+  PERFORMANCE = 'performance',
+  SAFETY = 'safety',
+  MAINTENANCE = 'maintenance',
+  ENVIRONMENTAL = 'environmental',
+}
+
+export enum ReportFormat {
+  PDF = 'pdf',
+  EXCEL = 'excel',
+  CSV = 'csv',
+}
+
+export enum ComplianceStatus {
+  COMPLIANT = 'compliant',
+  NON_COMPLIANT = 'non_compliant',
+  PARTIAL = 'partial',
+  NOT_ASSESSED = 'not_assessed',
+}
+
+export enum AuditAction {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LOGIN = 'login',
+  LOGOUT = 'logout',
+  STATUS_CHANGE = 'status_change',
+  ASSIGN = 'assign',
+  RESOLVE = 'resolve',
+  ACKNOWLEDGE = 'acknowledge',
+  EXPORT = 'export',
+  BACKUP = 'backup',
+}
+
+export enum ModelStatus {
+  TRAINING = 'training',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  ERROR = 'error',
+  ARCHIVED = 'archived',
+}
+
+export enum CameraStatus {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  ERROR = 'error',
+  RECORDING = 'recording',
+  MAINTENANCE = 'maintenance',
+}
+
+export interface ISensorReadingValue {
+  value: number;
+  unit: string;
+  timestamp: Date;
+  quality?: number;
+}
+
+export interface INotificationPayload {
+  title: string;
+  message: string;
+  data?: Record<string, unknown>;
+  actionUrl?: string;
+}

@@ -1,4 +1,5 @@
 import { Response, NextFunction } from 'express';
+import { Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
 import { ApiError } from '../utils/ApiError';
@@ -34,4 +35,20 @@ export function authorize(...roles: UserRole[]) {
 
     next();
   };
+}
+
+export function authenticateSocket(socket: Socket, next: (err?: Error) => void): void {
+  const token = socket.handshake.auth.token || socket.handshake.query.token;
+
+  if (!token) {
+    return next(new Error('Authentication required'));
+  }
+
+  try {
+    const decoded = jwt.verify(token as string, config.jwt.accessSecret) as IAuthPayload;
+    socket.data.user = decoded;
+    next();
+  } catch {
+    next(new Error('Invalid token'));
+  }
 }

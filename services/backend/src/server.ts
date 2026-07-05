@@ -5,6 +5,9 @@ import { logger } from './config/logger';
 import { connectDatabase } from './config/database';
 import { connectRedis } from './config/redis';
 import { initializeSocket } from './sockets/incidentSocket';
+import { initializeSocketGateway } from './sockets/SocketGateway';
+import { initializeAllWorkers } from './jobs/workers';
+import { startScheduler } from './jobs/scheduler';
 
 async function startServer(): Promise<void> {
   try {
@@ -12,12 +15,18 @@ async function startServer(): Promise<void> {
     await connectRedis();
 
     const httpServer = createServer(app);
+
     initializeSocket(httpServer);
+    initializeSocketGateway(httpServer);
+
+    initializeAllWorkers();
+    startScheduler();
 
     httpServer.listen(config.port, () => {
       logger.info(`GuardianAI Pro API running on port ${config.port}`);
       logger.info(`API Docs available at http://localhost:${config.port}/api-docs`);
       logger.info(`Environment: ${config.env}`);
+      logger.info('Workers initialized: risk-analysis, report-generation, push, email, sms, sensor-ingestion, data-export');
     });
   } catch (error) {
     logger.error('Failed to start server', { error });
@@ -34,7 +43,7 @@ process.on('uncaughtException', (error: Error) => {
   process.exit(1);
 });
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully');
   process.exit(0);
 });

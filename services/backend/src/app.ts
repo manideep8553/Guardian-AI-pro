@@ -54,6 +54,11 @@ app.get('/health', (_req, res) => {
     message: 'GuardianAI Pro API is running',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    version: '1.0.0',
+    models: 32,
+    routes: 80,
+    workers: 7,
+    queues: 9,
   });
 });
 
